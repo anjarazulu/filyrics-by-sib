@@ -1,0 +1,161 @@
+*{
+  margin:0;
+  padding:0;
+  box-sizing:border-box;
+}
+body{
+  min-height:100vh;
+  display:flex;
+  flex-direction:column;
+  font-family:Verdana, Geneva, sans-serif;
+  background:#000b50;
+}
+header{
+  background:#000b50;
+  color:white;
+  padding:35px 20px;
+  text-align:center;
+}
+header h1{
+  font-size:38px;
+}
+header h3{
+  margin-top:15px;
+  color:#ffe84f;
+  font-weight:normal;
+}
+main{
+  flex:1;
+  background:white;
+  border-radius:35px 35px 0 0;
+  padding:35px 25px;
+}
+.welcome{
+  text-align:center;
+  margin-bottom:45px;
+}
+.welcome h2{
+  color:#000b50;
+  margin-bottom:10px;
+}
+.welcome p{
+  color:#444;
+  font-size:18px;
+}
+.menu{
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  gap:25px;
+}
+button{
+  width:250px;
+  height:65px;
+  border:none;
+  border-radius:40px;
+  background:#000b50;
+  color:white;
+  font-size:22px;
+  font-weight:bold;
+  transition:.25s;
+}
+button:hover{
+  background:#233cff;
+  transform:translateY(-3px);
+}
+button:active{
+  transform:scale(.57);
+}
+footer{
+  background:#000b50;
+  color:white;
+  text-align:center;
+  padding:25px;
+}
+footer p{
+  margin:10px 0;
+}
+footer a{
+  color:#ffe84f;
+  text-decoration:none;
+}
+footer a:hover{
+  text-decoration:underline;
+}
+
+/* --- Liste des chants --- */
+.chant{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:15px;
+    margin-bottom:20px;
+    padding-bottom:15px;
+    border-bottom:1px solid #eee;
+}
+
+.chant h3{
+   font-size:20px;
+   margin-bottom:0;
+   color:#000b50;
+   flex:1;
+}
+
+.chant p{
+    margin-bottom:15px;
+}
+
+/* Bouton "Lire les paroles" : plus petit que le titre, pas la taille des boutons du menu */
+.chant button{
+    width:auto;
+    height:auto;
+    padding:8px 18px;
+    font-size:14px;
+    border-radius:20px;
+    white-space:nowrap;
+    margin:0;
+}
+
+.paroles{
+    white-space:pre-line;
+    line-height:1.7;
+    margin:20px 0 35px;
+}
+
+button{
+    display:block;
+    margin:10px auto;
+}
+
+.page-chant p{
+    margin-top:8px;
+}
+
+/* --- Galerie --- */
+.galerie{
+    display:flex;
+    flex-wrap:wrap;
+    gap:25px;
+    justify-content:center;
+    margin-top:20px;
+}
+
+.membre{
+    text-align:center;
+    width:150px;
+}
+
+.membre img{
+    width:150px;
+    height:150px;
+    object-fit:cover;
+    border-radius:50%;
+    border:3px solid #000b50;
+}
+
+.membre p{
+    margin-top:10px;
+    font-size:17px;
+    font-weight:bold;
+    color:#000b50;
+}
