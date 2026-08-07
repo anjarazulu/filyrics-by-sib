@@ -88,13 +88,12 @@ Koa Magnana Azy eh, mijoro ake
 Izaho hoy aho (tsy ho kivy) x3
 Magnana Anao miahy ahy isan'andro oh
 Izaho hoy aho (tsy ho very) x3
-Fa misy Anao tsy mamela ahy i
+Fa misy Anao tsy mamela ahy irery
 
 Koa magnana Azy eh, toujours mande
 Koa magnana Azy eh, tsy maintsy courage eh eh
 Koa Magnana Azy eh, tsy misy mihemotra oh
-Koa Magnana Azy eh, mijoro ake fô ou oh
-rery`
+Koa Magnana Azy eh, mijoro ake fô ou oh`
     },
     {
         id: 5,
@@ -201,16 +200,17 @@ Tompo andriamanitro eh x2`
 ];
 
 const membres = [
-    { nom: "Manantenasoa Anjaraniaina (Nosy)", photo: "images/anjara.jpeg" },
+    { nom: "Manantenasoa Anjaraniaina", photo: "images/anjara.jpeg" },
     { nom: "Arson Nicolas", photo: "images/nicolas.jpg" }
 ];
 
-function afficherAccueil() {
+function afficherAccueil(push = true) {
     main.innerHTML = accueilHTML;
+    if (push) history.pushState({ view: "accueil" }, "", "#accueil");
 }
 
-function afficherParoles() {
-    let contenu = "<h2>📖 Liste des chants</h2>";
+function afficherParoles(push = true) {
+    let contenu = "<h2>Liste des chants</h2>";
 
     chants.forEach(chant => {
         contenu += `
@@ -220,11 +220,12 @@ function afficherParoles() {
         </div>`;
     });
 
-    contenu += `<button data-action="accueil">🏠 Retour à l'accueil</button>`;
+    contenu += `<button data-action="accueil">Retour à l'accueil</button>`;
     main.innerHTML = contenu;
+    if (push) history.pushState({ view: "paroles" }, "", "#paroles");
 }
 
-function afficherChant(id) {
+function afficherChant(id, push = true) {
     const chant = chants.find(c => c.id === id);
 
     main.innerHTML = `
@@ -233,12 +234,13 @@ function afficherChant(id) {
         <p><strong>Auteur :</strong> ${chant.auteur}</p>
         <p><strong>Compositeur :</strong> ${chant.compositeur}</p>
         <p class="paroles">${chant.paroles}</p>
-        <button data-action="paroles">↩ Retour aux paroles</button>
+        <button data-action="paroles">Retour aux paroles</button>
     </section>`;
+    if (push) history.pushState({ view: "chant", id }, "", "#chant-" + id);
 }
 
-function afficherGalerie() {
-    let contenu = `<h2>🖼 Galerie</h2><div class="galerie">`;
+function afficherGalerie(push = true) {
+    let contenu = `<h2>Galerie</h2><div class="galerie">`;
 
     membres.forEach(membre => {
         contenu += `
@@ -248,13 +250,33 @@ function afficherGalerie() {
         </div>`;
     });
 
-    contenu += `</div><button data-action="accueil">🏠 Retour à l'accueil</button>`;
+    contenu += `</div><button data-action="accueil">Retour à l'accueil</button>`;
     main.innerHTML = contenu;
+    if (push) history.pushState({ view: "galerie" }, "", "#galerie");
 }
 
-document.addEventListener("click", function(e) {
+// Marque la page d'accueil comme premier point de l'historique
+history.replaceState({ view: "accueil" }, "", "#accueil");
+
+// Gère le bouton retour physique / navigateur
+window.addEventListener("popstate", (e) => {
+    const state = e.state;
+    if (!state || state.view === "accueil") {
+        afficherAccueil(false);
+    } else if (state.view === "paroles") {
+        afficherParoles(false);
+    } else if (state.view === "chant") {
+        afficherChant(state.id, false);
+    } else if (state.view === "galerie") {
+        afficherGalerie(false);
+    }
+});
+
+document.addEventListener("click", function (e) {
     const btn = e.target.closest("button");
     if (!btn) return;
+
+    const texte = btn.textContent.trim().toLowerCase();
 
     if (btn.dataset.action === "chant") {
         afficherChant(Number(btn.dataset.id));
@@ -262,9 +284,9 @@ document.addEventListener("click", function(e) {
         afficherParoles();
     } else if (btn.dataset.action === "accueil") {
         afficherAccueil();
-    } else if (btn.textContent.includes("📖")) {
+    } else if (texte.includes("parole")) {
         afficherParoles();
-    } else if (btn.textContent.includes("🖼")) {
+    } else if (texte.includes("galerie")) {
         afficherGalerie();
     }
 });
