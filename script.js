@@ -82,7 +82,7 @@ Koa Magnana Azy eh, mijoro ake
 Ny ety an-tany mihoatra Azy tsy misy raha pare
 Magnana Azy eh, toujours mafy eh
 Ireo fahavalo manenjika, tsy hampiontsona eh
-Magnana Azy eh toujours mafy eh.
+Magnana Azy eh mijoro ake
 
 Koa magnana Azy eh, toujours mande
 Koa magnana Azy eh, tsy maintsy courage eh eh
