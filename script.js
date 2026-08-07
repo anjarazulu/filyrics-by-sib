@@ -273,11 +273,68 @@ Tompo andriamanitro eh x2`
     Ka hatrary ankoatra ary
     Manana Anao hiaro ny dia`
     },
+    {
+        id: 11,
+        titre: "Asandratro",
+        auteur: "Arson Nicolas",
+        compositeur: "Arson Nicolas",
+        tonalite: "C / Am",
+        paroles: `Anio aho hihira ho Anao
+Anio aho hanandratra feo vaovao
+Mba ho ren'izao tontolo izao
+Ny hery sy hatsaranao
+Ka ho asandratro ny tanako
+Izay ahy koa ho atolotro
+Mba ho ren'izao tontolo izao
+Fa Masina tokoa Ianao
+
+Asandratro hatrany ny hira
+Fiderana ny Anaranao
+Ka ho hiraiko hatrany, hatrany
+Fa Masina sy matoky Ianao
+
+Hidera Anao ny foko sy ny saiko
+Ny maha izy ahy rehetra
+Hanandratra Anao amin'ny Avo
+Hasandratro ho Anao
+Izay rehetra mba ahy
+Ny voninahitra dia ho Anao Ray`
+    },
+    {
+        id: 12,
+        titre: "Mila Anao",
+        auteur: "Arson Nicolas",
+        compositeur: "Arson Nicolas",
+        tonalite: "B♭ / Gm",
+        paroles: `Sarotra, f'hijanona hijoro na dia tena reraka ary
+Sarotra, f'hijanona hitsiky na dia efa hita fa marary
+Sarotra, ny miaina anaty aizina f'izay no eto an-tany
+Nefa tsy hampaninona ahy satria Ianao eo anampy ahy ihany
+
+Mety ho teritery ny lalana makany f'izaho handroso sy ho eo foana
+Mety ho kivy sy ketraka, matoky satria manana Anao
+Misy fotoana ny lalana hikintaontaona
+Fa eo mihintsy no maha mpanomponao ahy
+Reraka matetika aho, fa misy Anao hijoro, ho sahy
+
+(Ny finoako Anao) io no mbola mampahery ahy
+(Ny anilanao) no tiako hitoerako indray
+Fa raha misy Anao dia tsy hanan-tahotra aho
+Tsy handeha irery izany, ary koa tsy hanahy
+Fa tantananao aho isaky ny mamindra, oh Raiko tia ahy
+
+F'efa fantatra fa (mila Anao) ny fiainako
+Izay rehetra atao dia (Mila Anao) ry mpamonjiko
+Satria misy Anao dia tsy hanan-tahotra
+Tsy handeha irery izany ary koa tsy hanahy
+Fa tantananao isaky ny mamindra, oh Raiko tia ahy`
+    },
 ];
 
 const membres = [
     { nom: "Manantenasoa Anjaraniaina", photo: "images/anjara.jpeg" },
-    { nom: "Arson Nicolas", photo: "images/nicolas.jpg" }
+    { nom: "Arson Nicolas", photo: "images/nicolas.jpg" },
+    { nom: "Liantsoa Rufin", photo: "images/rufin.jpg" },
 ];
 
 function afficherAccueil(push = true) {
