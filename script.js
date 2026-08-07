@@ -332,7 +332,7 @@ Fa tantananao isaky ny mamindra, oh Raiko tia ahy`
 ];
 
 const membres = [
-    { nom: "Manantenasoa Anjaraniaina", photo: "images/anjara.jpeg", description: "Anjara no anarako. Zava-kanto nitaiza ahy sy nihazona ahy tamin'ny fotoana sarotra ny mozika, tena ankafiziko izany ary entiko hanandratana Azy ao ambony izay haiko sy vitako. Tiako ihany koa ny mizara tsikitsiky amin'ny manodidina ahy." },
+    { nom: "Manantenasoa Anjaraniaina", photo: "images/anjara.jpeg", description: "Anjara no anarako. Zava-kanto nitaiza ahy sy nihazona ahy tamin'ny fotoana sarotra ny mozika, tena ankafiziko izany. Tiako ihany koa ny mizara tsikitsiky amin'ny manodidina ahy, tsy dia be resaka aho kanefa be hadalana toy ny zazakely." },
     { nom: "Arson Nicolas", photo: "images/nicolas.jpg", description: "" },
     { nom: "Daniel Ryan", photo: "images/ryan.jpg", description: "" },
     { nom: "Fifaliana Antsa", photo: "images/antsa.jpg", description: "" },
