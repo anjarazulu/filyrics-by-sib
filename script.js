@@ -212,19 +212,19 @@ Tompo andriamanitro eh x2`
         compositeur: "Arson Nicolas",
         tonalite: "B♭ / Gm",
         paroles: `Manakôry aby eh! Salama va? Akory lahaly?
-    Ino vaovao? Zahay salama tsy marary
-    Manao ahoana gôna, dia faly mahafantatra 
-    Efa ao daholo ve ireo tapaka sy namana
-    
-    Eto niany, miara-midera tsy misy miala
-    Fanjakam-pisorona, isika rehetra samy mpandray anjara
-    Alaviro androany ireo izay mety ho fahasamihafana 
-    Fa fifankatiavana, izay ihany eto no lalàna
-    
-    Andao hiara hidera eh, hiara-hitsikitsiky, hiara-hifaly
-    Ho ren'izao tontolo izao, ho ren-danitra, ho ren-tany
-    Fa isika izao mifankatia araky ny Teniny
-    "Mba ho iray ihany izy rehetra", izany no aoka hitoetra`
+Ino vaovao? Zahay salama tsy marary
+Manao ahoana gôna, dia faly mahafantatra
+Efa ao daholo ve ireo tapaka sy namana
+
+Eto niany, miara-midera tsy misy miala
+Fanjakam-pisorona, isika rehetra samy mpandray anjara
+Alaviro androany ireo izay mety ho fahasamihafana
+Fa fifankatiavana, izay ihany eto no lalàna
+
+Andao hiara hidera eh, hiara-hitsikitsiky, hiara-hifaly
+Ho ren'izao tontolo izao, ho ren-danitra, ho ren-tany
+Fa isika izao mifankatia araky ny Teniny
+"Mba ho iray ihany izy rehetra", izany no aoka hitoetra`
     },
     {
         id: 10,
@@ -233,45 +233,45 @@ Tompo andriamanitro eh x2`
         compositeur: "Arson Nicolas",
         tonalite: "C / Am",
         paroles: `Tsy asiana fetra, tsy ho rava intsony
-    Fa mitohy ety, ka hatrany Aminao
-    Ho iray tokoa, hanao izay soa
-    Ho any Aminao, Ray ô
-    Ny fiderana no mampiray
-    Ny fitiavanao tsy hiala aminay
-    Ka ho tonga hery, tsy hisy ho very
-    Fa eo an-tananao 'zahay
-    
-    Feo Iray, fo mifandray
-    No entinay hiderana Anao
-    Izahay ho hiray, ho mandrakizay
-    Ka hatrary ankoatra ary
-    Manana Anao hiaro ny dia
-    
-    Ny sakana tsy hisy intsony
-    Manana Anao ny fonay ho tony
-    Izay rehetra atao, hampifandray
-    Ka fo, fanahy ho iray
-    Isaoranay Ianao ry Ray
-    Nanome 'lay talenta soa ho anay
-    Entinay hidera, hanandratra Anao
-    Ka manomboka eto dia efa Anao
-    
-    Feo Iray, fo mifandray
-    No entinay hiderana Anao
-    Izahay ho hiray, ho mandrakizay
-    Ka hatrary ankoatra ary
-    Manana Anao hiaro ny dia
-    
-    Ka ho rava ny efitra
-    Nampisaraka hatrizay
-    Ka miombona indray ho iray izahay
-    Ho ao Aminao, ho mandrakizay
-    
-    Feo Iray, fo mifandray
-    No entinay hiderana Anao
-    Izahay ho hiray, ho mandrakizay
-    Ka hatrary ankoatra ary
-    Manana Anao hiaro ny dia`
+Fa mitohy ety, ka hatrany Aminao
+Ho iray tokoa, hanao izay soa
+Ho any Aminao, Ray ô
+Ny fiderana no mampiray
+Ny fitiavanao tsy hiala aminay
+Ka ho tonga hery, tsy hisy ho very
+Fa eo an-tananao 'zahay
+
+Feo Iray, fo mifandray
+No entinay hiderana Anao
+Izahay ho hiray, ho mandrakizay
+Ka hatrary ankoatra ary
+Manana Anao hiaro ny dia
+
+Ny sakana tsy hisy intsony
+Manana Anao ny fonay ho tony
+Izay rehetra atao, hampifandray
+Ka fo, fanahy ho iray
+Isaoranay Ianao ry Ray
+Nanome 'lay talenta soa ho anay
+Entinay hidera, hanandratra Anao
+Ka manomboka eto dia efa Anao
+
+Feo Iray, fo mifandray
+No entinay hiderana Anao
+Izahay ho hiray, ho mandrakizay
+Ka hatrary ankoatra ary
+Manana Anao hiaro ny dia
+
+Ka ho rava ny efitra
+Nampisaraka hatrizay
+Ka miombona indray ho iray izahay
+Ho ao Aminao, ho mandrakizay
+
+Feo Iray, fo mifandray
+No entinay hiderana Anao
+Izahay ho hiray, ho mandrakizay
+Ka hatrary ankoatra ary
+Manana Anao hiaro ny dia`
     },
     {
         id: 11,
@@ -398,7 +398,7 @@ function afficherGalerie(push = true) {
     membres.forEach(membre => {
         contenu += `
         <div class="membre">
-            <img src="${membre.photo}" alt="${membre.nom}">
+            <img src="${membre.photo}" alt="${membre.nom}" onerror="this.onerror=null; this.src='images/default.jpg';">
             <p>${membre.nom}</p>
         </div>`;
     });
@@ -443,3 +443,4 @@ document.addEventListener("click", function (e) {
         afficherGalerie();
     }
 });
+        
