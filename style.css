@@ -105,7 +105,6 @@ footer a:hover{
     margin-bottom:15px;
 }
 
-/* Bouton "Lire les paroles" : plus petit que le titre, pas la taille des boutons du menu */
 .chant button{
     width:auto;
     height:auto;
@@ -159,26 +158,31 @@ button{
     font-weight:bold;
     color:#000b50;
 }
-.toggle-description{
-    width:auto;
-    height:auto;
-    padding:2px 12px;
-    font-size:16px;
+
+.membre .toggle-description{
+    width:36px;
+    height:36px;
+    padding:0;
+    margin:8px auto 0;
+    font-size:14px;
     border-radius:50%;
-    margin:6px auto 0;
     background:transparent;
     color:#000b50;
     border:1px solid #000b50;
+    display:flex;
+    align-items:center;
+    justify-content:center;
 }
-.toggle-description:hover{
+.membre .toggle-description:hover{
     background:#000b50;
     color:white;
     transform:none;
 }
+
 .description-membre{
     margin-top:8px;
     font-size:13px;
     color:#555;
     font-style:italic;
     max-width:150px;
-}
+  }
