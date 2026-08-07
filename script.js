@@ -332,7 +332,7 @@ Fa tantananao isaky ny mamindra, oh Raiko tia ahy`
 ];
 
 const membres = [
-    { nom: "Manantenasoa Anjaraniaina", photo: "images/anjara.jpeg", description: "Anjara no anarako. Zava-kanto nitaiza ahy sy nihazona ahy tamin'ny fotoana sarotra ny mozika, tena ankafiziko izany. Tiako ihany koa ny mizara tsikitsiky amin'ny manodidina ahy, tsy dia be resaka aho kanefa be hadalana toy ny zazakely." },
+    { nom: "Manantenasoa Anjaraniaina", photo: "images/anjara.jpeg", photo2: "images/nosy.jpg", description: "Anjara no anarako. Zava-kanto nitaiza ahy sy nihazona ahy tamin'ny fotoana sarotra ny mozika, tena ankafiziko izany. Tiako ihany koa ny mizara tsikitsiky amin'ny manodidina ahy, tsy dia be resaka aho kanefa be hadalana toy ny zazakely." },
     { nom: "Arson Nicolas", photo: "images/nicolas.jpg", description: "" },
     { nom: "Daniel Ryan", photo: "images/ryan.jpg", description: "" },
     { nom: "Fifaliana Antsa", photo: "images/antsa.jpg", description: "" },
@@ -398,7 +398,10 @@ function afficherGalerie(push = true) {
     membres.forEach((membre, index) => {
         contenu += `
         <div class="membre">
-            <img src="${membre.photo}" alt="${membre.nom}" onerror="this.onerror=null; this.src='images/default.png';">
+            <div class="photo-wrapper">
+                <img class="photo-principale" src="${membre.photo}" alt="${membre.nom}" onerror="this.onerror=null; this.src='images/default.png';">
+                ${membre.photo2 ? `<img class="photo-secondaire" src="${membre.photo2}" alt="${membre.nom}">` : ''}
+            </div>
             <p>${membre.nom}</p>
             <button class="toggle-description" data-index="${index}">▾</button>
             <div class="description-membre" id="description-${index}" hidden>
@@ -406,6 +409,11 @@ function afficherGalerie(push = true) {
             </div>
         </div>`;
     });
+
+    contenu += `</div><button data-action="accueil">Retour à l'accueil</button>`;
+    main.innerHTML = contenu;
+    if (push) history.pushState({ view: "galerie" }, "", "#galerie");
+}
 
     contenu += `</div><button data-action="accueil">Retour à l'accueil</button>`;
     main.innerHTML = contenu;
