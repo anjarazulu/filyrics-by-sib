@@ -337,7 +337,7 @@ const membres = [
     { nom: "Daniel Ryan", photo: "images/ryan.jpg"},
     { nom: "Fifaliana Antsa", photo: "images/antsa.jpg"},
     { nom: "Mickaëlah Fy", photo: "images/fy.jpg"},
-    { nom: "Nomenasoa Sariaka", photo: "images/sariaka.jpg"},
+    { nom: "Nomenasoa Sariakaniaina", photo: "images/sariaka.jpg"},
     { nom: "Notahiantsoa Miaro", photo: "images/miaro.jpg"},
     { nom: "Faly Haingotiana", photo: "images/haingo.jpg"},
     { nom: "Soafaniry Lyanah", photo: "images/lyanah.jpg"},
