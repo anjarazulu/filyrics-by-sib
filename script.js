@@ -332,28 +332,28 @@ Fa tantananao isaky ny mamindra, oh Raiko tia ahy`
 ];
 
 const membres = [
-    { nom: "Manantenasoa Anjaraniaina", photo: "images/anjara.jpeg" },
-    { nom: "Arson Nicolas", photo: "images/nicolas.jpg" },
-    { nom: "Daniel Ryan", photo: "images/ryan.jpg"},
-    { nom: "Fifaliana Antsa", photo: "images/antsa.jpg"},
-    { nom: "Mickaëlah Fy", photo: "images/fy.jpg"},
-    { nom: "Nomenasoa Sariakaniaina", photo: "images/sariaka.jpg"},
-    { nom: "Notahiantsoa Miaro", photo: "images/miaro.jpg"},
-    { nom: "Faly Haingotiana", photo: "images/haingo.jpg"},
-    { nom: "Soafaniry Lyanah", photo: "images/lyanah.jpg"},
-    { nom: "Liantsoa Rufin", photo: "images/rufin.jpg" },
-    { nom: "Miora Francia", photo: "images/francia.jpg"},
-    { nom: "Miora Patricia", photo: "images/patricia.jpg"},
-    { nom: "Anaura Kassimo", photo: "images/kassimo.jpg"},
-    { nom: "Ornella Mitantsoa", photo: "images/mitantsoa.jpeg"},
-    { nom: "Joeson Rodiah", photo: "images/rodiah.jpg"},
-    { nom: "Vanintsoa Niaro", photo: "images/niaro.jpg"},
-    { nom: "Feno Fitahiana", photo: "images/fitahiana.jpg"},
-    { nom: "Mbolatiana Kantosoa", photo: "images/kanto.jpg"},
-    { nom: "Tsarovaniaina Sariaka", photo: "images/psariaka.jpg"},
-    { nom: "Tsarovaniaina Sarindra", photo: "images/sarindra.jpg"},
-    { nom: "Lovasoa Annah", photo: "images/annah.jpg"},
-    { nom: "Danielle Shania", photo: "images/shania.jpg"},
+    { nom: "Manantenasoa Anjaraniaina", photo: "images/anjara.jpeg", description: "" },
+    { nom: "Arson Nicolas", photo: "images/nicolas.jpg", description: "" },
+    { nom: "Daniel Ryan", photo: "images/ryan.jpg", description: "" },
+    { nom: "Fifaliana Antsa", photo: "images/antsa.jpg", description: "" },
+    { nom: "Mickaëlah Fy", photo: "images/fy.jpg", description: "" },
+    { nom: "Nomenasoa Sariakaniaina", photo: "images/sariaka.jpg", description: "" },
+    { nom: "Notahiantsoa Miaro", photo: "images/miaro.jpg", description: "" },
+    { nom: "Faly Haingotiana", photo: "images/haingo.jpg", description: "" },
+    { nom: "Soafaniry Lyanah", photo: "images/lyanah.jpg", description: "" },
+    { nom: "Liantsoa Rufin", photo: "images/rufin.jpg", description: "" },
+    { nom: "Miora Francia", photo: "images/francia.jpg", description: "" },
+    { nom: "Miora Patricia", photo: "images/patricia.jpg", description: "" },
+    { nom: "Anaura Kassimo", photo: "images/kassimo.jpg", description: "" },
+    { nom: "Ornella Mitantsoa", photo: "images/mitantsoa.jpeg", description: "" },
+    { nom: "Joeson Rodiah", photo: "images/rodiah.jpg", description: "" },
+    { nom: "Vanintsoa Niaro", photo: "images/niaro.jpg", description: "" },
+    { nom: "Feno Fitahiana", photo: "images/fitahiana.jpg", description: "" },
+    { nom: "Mbolatiana Kantosoa", photo: "images/kanto.jpg", description: "" },
+    { nom: "Tsarovaniaina Sariaka", photo: "images/psariaka.jpg", description: "" },
+    { nom: "Tsarovaniaina Sarindra", photo: "images/sarindra.jpg", description: "" },
+    { nom: "Lovasoa Annah", photo: "images/annah.jpg", description: "" },
+    { nom: "Danielle Shania", photo: "images/shania.jpg", description: "" },
 ];
 
 function afficherAccueil(push = true) {
@@ -395,11 +395,15 @@ function afficherChant(id, push = true) {
 function afficherGalerie(push = true) {
     let contenu = `<h2>Galerie</h2><div class="galerie">`;
 
-    membres.forEach(membre => {
+    membres.forEach((membre, index) => {
         contenu += `
         <div class="membre">
             <img src="${membre.photo}" alt="${membre.nom}" onerror="this.onerror=null; this.src='images/default.png';">
             <p>${membre.nom}</p>
+            <button class="toggle-description" data-index="${index}">▾</button>
+            <div class="description-membre" id="description-${index}" hidden>
+                <p>${membre.description}</p>
+            </div>
         </div>`;
     });
 
@@ -408,10 +412,8 @@ function afficherGalerie(push = true) {
     if (push) history.pushState({ view: "galerie" }, "", "#galerie");
 }
 
-// Marque la page d'accueil comme premier point de l'historique
 history.replaceState({ view: "accueil" }, "", "#accueil");
 
-// Gère le bouton retour physique / navigateur
 window.addEventListener("popstate", (e) => {
     const state = e.state;
     if (!state || state.view === "accueil") {
@@ -431,6 +433,14 @@ document.addEventListener("click", function (e) {
 
     const texte = btn.textContent.trim().toLowerCase();
 
+    if (btn.classList.contains("toggle-description")) {
+        const index = btn.dataset.index;
+        const descDiv = document.getElementById(`description-${index}`);
+        descDiv.hidden = !descDiv.hidden;
+        btn.textContent = descDiv.hidden ? "▾" : "▴";
+        return;
+    }
+
     if (btn.dataset.action === "chant") {
         afficherChant(Number(btn.dataset.id));
     } else if (btn.dataset.action === "paroles") {
@@ -443,4 +453,3 @@ document.addEventListener("click", function (e) {
         afficherGalerie();
     }
 });
-        
