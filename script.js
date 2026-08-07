@@ -7,6 +7,7 @@ const chants = [
         titre: "Hazavan'ny aliko",
         auteur: "Arson Nicolas",
         compositeur: "Manoa",
+        tonalite: "A / F#m",
         paroles: `Ianao ilay hazavan'ny aliko
 Izay miposaka indray ho ahy
 Ianao ilay manazava ny amiko rehetra
@@ -27,6 +28,7 @@ Hazavana (x4)`
         titre: "Kasiho",
         auteur: "Arson Nicolas",
         compositeur: "Arson Nicolas",
+        tonalite: "A / F#m",
         paroles: `Ny sitrakao Tompo ô, no aoka hatao
 Ny lalanao no hizorako
 Ny herinao no mampahery ahy
@@ -42,6 +44,7 @@ Jesosy ô, Jesosy ô kasiho ny foko`
         titre: "Ny Ray",
         auteur: "Arson Nicolas",
         compositeur: "Arson Nicolas",
+        tonalite: "A / F#m",
         paroles: `Avelako any ireo sakana ho ahy
 Ary tsy avelako hanakana ahy izao rehetra izao
 Hadinoiko avokoa satria efa nofafany
@@ -65,6 +68,7 @@ Efa fantatro fa eo anilako eo...`
         titre: "Magnana Azy",
         auteur: "Arson Nicolas",
         compositeur: "Arson Nicolas",
+        tonalite: "F / Dm",
         paroles: `Tompo mahery ny Andriamanitro eh
 'lay Nahary izao rehetra izao, mitahy ahy sy ianao
 Ireo olako kely jamais jamais, tsy hampiondrika ahy
@@ -100,6 +104,7 @@ Koa Magnana Azy eh, mijoro ake fô ou oh`
         titre: "Avo Indrindra",
         auteur: "Arson Nicolas & Antsa Fifaliana",
         compositeur: "Antsa Fifaliana",
+        tonalite: "C /Am",
         paroles: `Hidera Anao amin'ny foko rehetra aho
 Hanambara ireo zava-mahagaga nataonao
 Ny foko ent-nin'kafaliana
@@ -123,6 +128,7 @@ Ho Anao tokoa, ry Avo indrindra ô`
         titre: "Mahery aho",
         auteur: "Arson Nicolas",
         compositeur: "Arson Nicolas",
+        tonalite: "C / Am",
         paroles: `Ekeko hoe mafy ny ady, fantatro hoe izaho mila mafy
 Ilay haka aina anie satry fa io anie tsy hoe ny ahy irery
 Ka tsy asiana tomany, ny aty anie efa ohatr'izany
@@ -146,6 +152,7 @@ Mahery aho manana Anao, mahery aho Tompo ô`
         titre: "Fantatro",
         auteur: "Arson Nicolas",
         compositeur: "Arson Nicolas",
+        tonalite: "A♭ /Fm",
         paroles: `Asehoy ahy izay mbola tsy hitako
 Hazavao ireo izay tsy takatro
 Lazao ahy Izay mbola tsy fantatro
@@ -174,6 +181,7 @@ Oh ! oh ! Fantatro ilay Mpamonjy ahy`
         titre: "Hidera Anao",
         auteur: "Arson Nicolas",
         compositeur: "Arson Nicolas",
+        tonalite: "D / Bm",
         paroles: `Hidera Anao izaho Tompo Malalako ô
 Hankalaza ny Anaranao Raiko tia zah (ah ! ah ! eh !)
 Ny midera Anao Raiko roh hasambarako eh
@@ -196,6 +204,74 @@ Ka hihira aho hanandratra feo mahery
 Hiderako anao zegny x2
 Ka hihira aho hanandratra Anao
 Tompo andriamanitro eh x2`
+    },
+    {
+        id: 9,
+        titre: "Manakôry",
+        auteur: "Arson Nicolas",
+        compositeur: "Arson Nicolas",
+        tonalite: "B♭ / Gm",
+        paroles: `Manakôry aby eh! Salama va? Akory lahaly?
+    Ino vaovao? Zahay salama tsy marary
+    Manao ahoana gôna, dia faly mahafantatra 
+    Efa ao daholo ve ireo tapaka sy namana
+    
+    Eto niany, miara-midera tsy misy miala
+    Fanjakam-pisorona, isika rehetra samy mpandray anjara
+    Alaviro androany ireo izay mety ho fahasamihafana 
+    Fa fifankatiavana, izay ihany eto no lalàna
+    
+    Andao hiara hidera eh, hiara-hitsikitsiky, hiara-hifaly
+    Ho ren'izao tontolo izao, ho ren-danitra, ho ren-tany
+    Fa isika izao mifankatia araky ny Teniny
+    "Mba ho iray ihany izy rehetra", izany no aoka hitoetra`
+    },
+    {
+        id: 10,
+        titre: "Iray",
+        auteur: "Arson Nicolas",
+        compositeur: "Arson Nicolas",
+        tonalite: "C / Am",
+        paroles: `Tsy asiana fetra, tsy ho rava intsony
+    Fa mitohy ety, ka hatrany Aminao
+    Ho iray tokoa, hanao izay soa
+    Ho any Aminao, Ray ô
+    Ny fiderana no mampiray
+    Ny fitiavanao tsy hiala aminay
+    Ka ho tonga hery, tsy hisy ho very
+    Fa eo an-tananao 'zahay
+    
+    Feo Iray, fo mifandray
+    No entinay hiderana Anao
+    Izahay ho hiray, ho mandrakizay
+    Ka hatrary ankoatra ary
+    Manana Anao hiaro ny dia
+    
+    Ny sakana tsy hisy intsony
+    Manana Anao ny fonay ho tony
+    Izay rehetra atao, hampifandray
+    Ka fo, fanahy ho iray
+    Isaoranay Ianao ry Ray
+    Nanome 'lay talenta soa ho anay
+    Entinay hidera, hanandratra Anao
+    Ka manomboka eto dia efa Anao
+    
+    Feo Iray, fo mifandray
+    No entinay hiderana Anao
+    Izahay ho hiray, ho mandrakizay
+    Ka hatrary ankoatra ary
+    Manana Anao hiaro ny dia
+    
+    Ka ho rava ny efitra
+    Nampisaraka hatrizay
+    Ka miombona indray ho iray izahay
+    Ho ao Aminao, ho mandrakizay
+    
+    Feo Iray, fo mifandray
+    No entinay hiderana Anao
+    Izahay ho hiray, ho mandrakizay
+    Ka hatrary ankoatra ary
+    Manana Anao hiaro ny dia`
     },
 ];
 
@@ -233,6 +309,7 @@ function afficherChant(id, push = true) {
         <h2>${chant.titre}</h2>
         <p><strong>Auteur :</strong> ${chant.auteur}</p>
         <p><strong>Compositeur :</strong> ${chant.compositeur}</p>
+        <p><strong>Tonalité :</strong> ${chant.tonalite}</p>
         <p class="paroles">${chant.paroles}</p>
         <button data-action="paroles">Retour aux paroles</button>
     </section>`;
