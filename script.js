@@ -352,7 +352,7 @@ const membres = [
     { nom: "Mbolatiana Kantosoa", photo: "images/kanto.jpg"},
     { nom: "Tsarovaniaina Sariaka", photo: "images/psariaka.jpg"},
     { nom: "Tsarovaniaina Sarindra", photo: "images/sarindra.jpg"},
-    { nom: "Lovasoa Annah", photo: "images/annah.jpeg"},
+    { nom: "Lovasoa Annah", photo: "images/annah.jpg"},
     { nom: "Danielle Shania", photo: "images/shania.jpg"},
 ];
 
