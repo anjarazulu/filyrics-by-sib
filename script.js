@@ -345,14 +345,14 @@ const membres = [
     { nom: "Miora Francia", photo: "images/francia.jpg"},
     { nom: "Miora Patricia", photo: "images/patricia.jpg"},
     { nom: "Anaura Kassimo", photo: "images/kassimo.jpg"},
-    { nom: "Ornella Mitantsoa", photo: "images/mitantsoa.jpg"},
+    { nom: "Ornella Mitantsoa", photo: "images/mitantsoa.jpeg"},
     { nom: "Joeson Rodiah", photo: "images/rodiah.jpg"},
     { nom: "Vanintsoa Niaro", photo: "images/niaro.jpg"},
     { nom: "Feno Fitahiana", photo: "images/fitahiana.jpg"},
     { nom: "Mbolatiana Kantosoa", photo: "images/kanto.jpg"},
     { nom: "Tsarovaniaina Sariaka", photo: "images/psariaka.jpg"},
     { nom: "Tsarovaniaina Sarindra", photo: "images/sarindra.jpg"},
-    { nom: "Lovasoa Annah", photo: "images/annah.jpg"},
+    { nom: "Lovasoa Annah", photo: "images/annah.jpeg"},
     { nom: "Danielle Shania", photo: "images/shania.jpg"},
 ];
 
@@ -398,7 +398,7 @@ function afficherGalerie(push = true) {
     membres.forEach(membre => {
         contenu += `
         <div class="membre">
-            <img src="${membre.photo}" alt="${membre.nom}" onerror="this.onerror=null; this.src='images/default.jpg';">
+            <img src="${membre.photo}" alt="${membre.nom}" onerror="this.onerror=null; this.src='images/default.png';">
             <p>${membre.nom}</p>
         </div>`;
     });
