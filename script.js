@@ -336,6 +336,10 @@ const membres = [
     { nom: "Arson Nicolas", photo: "images/nicolas.jpg" },
     { nom: "Liantsoa Rufin", photo: "images/rufin.jpg" },
     { nom: "Mickaëlah Fy", photo: "images/fy.jpg"},
+    { nom: "Daniel Ryan", photo: "images/ryan.jpg"},
+    { nom: "Nomenasoa Sariaka", photo: "images/sariaka.jpg"},
+    { nom: "Mbolatiana Kantosoa", photo: "kanto/kanto.jpg"},
+    { nom: "Danielle Shania", photo: "images/shania.jpg"},
 ];
 
 function afficherAccueil(push = true) {
