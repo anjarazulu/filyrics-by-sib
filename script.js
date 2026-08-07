@@ -335,6 +335,7 @@ const membres = [
     { nom: "Manantenasoa Anjaraniaina", photo: "images/anjara.jpeg" },
     { nom: "Arson Nicolas", photo: "images/nicolas.jpg" },
     { nom: "Liantsoa Rufin", photo: "images/rufin.jpg" },
+    { nom: "Mickaella Fy", photo: "images/fy.jpg"},
 ];
 
 function afficherAccueil(push = true) {
