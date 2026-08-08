@@ -60,6 +60,25 @@ function afficherGalerie(push = true) {
     if (push) history.pushState({ view: "galerie" }, "", "#galerie");
 }
 
+// Construit le HTML du carrousel de photos qui défile en boucle pour un événement.
+// Accepte soit e.photos (tableau), soit l'ancien format e.photo (une seule image).
+function genererCarrouselPhotos(e) {
+    const photos = e.photos && e.photos.length > 0 ? e.photos : (e.photo ? [e.photo] : []);
+    if (photos.length === 0) return '';
+
+    const imgTag = (src) =>
+        `<img src="${src}" alt="${e.titre}" onerror="this.onerror=null; this.src='images/default.png';">`;
+
+    // Une seule photo : pas besoin de défilement, on l'affiche simplement
+    if (photos.length === 1) {
+        return `<div class="scroll-photos scroll-photos-fixe">${imgTag(photos[0])}</div>`;
+    }
+
+    // Plusieurs photos : la liste est dupliquée pour un défilement sans coupure
+    const suite = photos.map(imgTag).join('') + photos.map(imgTag).join('');
+    return `<div class="scroll-photos"><div class="scroll-track">${suite}</div></div>`;
+}
+
 function afficherEvenements(push = true) {
     const passes = evenements.filter(e => e.statut === "passe");
     const futurs = evenements.filter(e => e.statut === "futur");
@@ -71,7 +90,7 @@ function afficherEvenements(push = true) {
         futurs.forEach(e => {
             contenu += `
             <div class="evenement">
-                <img src="${e.photo}" alt="${e.titre}" onerror="this.onerror=null; this.src='images/default.png';">
+                ${genererCarrouselPhotos(e)}
                 <h4>${e.titre}</h4>
                 <p class="date-evenement">${e.date}</p>
                 <p>${e.description}</p>
@@ -85,7 +104,7 @@ function afficherEvenements(push = true) {
         passes.forEach(e => {
             contenu += `
             <div class="evenement">
-                <img src="${e.photo}" alt="${e.titre}" onerror="this.onerror=null; this.src='images/default.png';">
+                ${genererCarrouselPhotos(e)}
                 <h4>${e.titre}</h4>
                 <p class="date-evenement">${e.date}</p>
                 <p>${e.description}</p>
