@@ -28,7 +28,7 @@ const evenements = [
         titre: "Répétitions",
         date: "Grandes vacances 2024",
         statut: "passe",
-        photos: ["images/reps1b.jpg", "images/reps1c.jpg", "images/reps1d.jpg", "images/reps1a.jpg"],
+        photos: ["images/reps1b.JPG", "images/reps1c.JPG", "images/reps1d.JPG", "images/reps1a.jpg"],
         description: "Famerenana sy fianarana natao nandritra ny fialan-tsasatra ary mba ho fanomanana ny fotoan-dehibe izay nataon'ny tarika"
     },
     {
