@@ -415,11 +415,6 @@ function afficherGalerie(push = true) {
     if (push) history.pushState({ view: "galerie" }, "", "#galerie");
 }
 
-    contenu += `</div><button data-action="accueil">Retour à l'accueil</button>`;
-    main.innerHTML = contenu;
-    if (push) history.pushState({ view: "galerie" }, "", "#galerie");
-}
-
 history.replaceState({ view: "accueil" }, "", "#accueil");
 
 window.addEventListener("popstate", (e) => {
