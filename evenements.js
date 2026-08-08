@@ -4,15 +4,22 @@ const evenements = [
         titre: "Création du Feo Iray Gospel",
         date: "08 Mai 2024",
         statut: "passe",
-        photo: "images/evenement1.jpg",
+        photo: "images/event1.jpg",
         description: "«...mba ho iray ihany izy rehetra», fivoriana voalohany tao amin'ny Amphithéâtre an'ny Lycée Privée Catholique Saint Jean de Matha ny coach Arson Nicolas no nampianatra ireo membres voalohany ny foto-kevitra «Gospel». Tamin'izany ny anaran'ny tarika dia mbola hoe «Origins Choir»."
     },
     {
         id: 2,
+        titre: "Déjeuner concer au St Jean de Matha",
+        date: "31 Mai 2024",
+        statut: "passe",
+        photo: "images/djn.jpeg",
+        description: "Nandray anjara tamin'ny déjeuner concert izay nataon'ny Lycée St Jean de Matha ny Feo Iray",
+    {
+        id: 3,
         titre: "Fampisehoana alina nialohan'ny fetim-pirenena",
         date: "25 juin 2024",
         statut: "passe",
-        photo: "images/evenement2.jpg",
+        photo: "images/event2.jpg",
         description: "Nandray anjara tamin'ny fampisehoana nandritra ny varotra teo amin'ny Fafah Botika nandritra ny alina nialohan'ny fetim-pirenena ny tarika."
     },
 ];
