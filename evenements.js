@@ -9,11 +9,12 @@ const evenements = [
     },
     {
         id: 2,
-        titre: "Déjeuner concer au St Jean de Matha",
+        titre: "Déjeuner concert au St Jean de Matha",
         date: "31 Mai 2024",
         statut: "passe",
         photo: "images/djn.jpeg",
-        description: "Nandray anjara tamin'ny déjeuner concert izay nataon'ny Lycée St Jean de Matha ny Feo Iray",
+        description: "Nandray anjara tamin'ny déjeuner concert izay nataon'ny Lycée St Jean de Matha ny Feo Iray"
+    },
     {
         id: 3,
         titre: "Fampisehoana alina nialohan'ny fetim-pirenena",
