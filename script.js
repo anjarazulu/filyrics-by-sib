@@ -110,7 +110,6 @@ window.addEventListener("popstate", (e) => {
         afficherChant(state.id, false);
     } else if (state.view === "galerie") {
         afficherGalerie(false);
-    }
     } else if (state.view === "evenements") {
     afficherEvenements(false);
     }
