@@ -1,31 +1,6 @@
 const main = document.querySelector("main");
 const accueilHTML = main.innerHTML;
 
-const membres = [
-    { nom: "Manantenasoa Anjaraniaina", photo: "images/anjara.jpeg", photo2: "images/nosy.jpg", description: "Anjara no anarako. Zava-kanto nitaiza ahy sy nihazona ahy tamin'ny fotoana sarotra ny mozika, tena ankafiziko izany. Tiako ihany koa ny mizara tsikitsiky amin'ny manodidina ahy, tsy dia be resaka aho kanefa be hadalana toy ny zazakely." },
-    { nom: "Arson Nicolas", photo: "images/nicolas.jpg", description: "" },
-    { nom: "Daniel Ryan", photo: "images/ryan.jpg", description: "" },
-    { nom: "Fifaliana Antsa", photo: "images/antsa.jpg", description: "" },
-    { nom: "Fy Mickaëlah", photo: "images/fy.jpg", description: "" },
-    { nom: "Nomenasoa Sariakaniaina", photo: "images/sariaka.jpg", description: "" },
-    { nom: "Notahiantsoa Miaro", photo: "images/miaro.jpg", description: "" },
-    { nom: "Faly Haingotiana", photo: "images/haingo.jpg", description: "" },
-    { nom: "Soafaniry Lyanah", photo: "images/lyanah.jpg", description: "" },
-    { nom: "Liantsoa Rufin", photo: "images/rufin.jpg", description: "" },
-    { nom: "Miora Francia", photo: "images/francia.jpg", description: "" },
-    { nom: "Miora Patricia", photo: "images/patricia.jpg", description: "" },
-    { nom: "Anaura Kassimo", photo: "images/kassimo.jpg", description: "" },
-    { nom: "Ornella Mitantsoa", photo: "images/mitantsoa.jpeg", description: "" },
-    { nom: "Joeson Rodiah", photo: "images/rodiah.jpg", description: "" },
-    { nom: "Vanintsoa Niaro", photo: "images/niaro.jpg", description: "" },
-    { nom: "Feno Fitahiana", photo: "images/fitahiana.jpg", description: "" },
-    { nom: "Mbolatiana Kantosoa", photo: "images/kanto.jpg", description: "" },
-    { nom: "Tsarovaniaina Sariaka", photo: "images/psariaka.jpg", description: "" },
-    { nom: "Tsarovaniaina Sarindra", photo: "images/sarindra.jpg", description: "" },
-    { nom: "Lovasoa Annah", photo: "images/annah.jpg", description: "" },
-    { nom: "Danielle Shania", photo: "images/shania.jpg", description: "" },
-];
-
 function afficherAccueil(push = true) {
     main.innerHTML = accueilHTML;
     if (push) history.pushState({ view: "accueil" }, "", "#accueil");
