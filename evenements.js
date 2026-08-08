@@ -23,4 +23,12 @@ const evenements = [
         photo: "images/event2.jpg",
         description: "Nandray anjara tamin'ny fampisehoana nandritra ny varotra teo amin'ny Fafah Botika nandritra ny alina nialohan'ny fetim-pirenena ny tarika."
     },
+    {
+        id: 4,
+        titre: "Répétitions",
+        date: "Grandes vacances 2024",
+        statut: "passe",
+        photo: "images/reps.jpeg",
+        description: "Nandray anjara tamin'ny déjeuner concert izay nataon'ny Lycée St Jean de Matha ny Feo Iray"
+    },
 ];
