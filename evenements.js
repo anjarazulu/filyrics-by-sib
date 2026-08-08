@@ -71,4 +71,12 @@ const evenements = [
         photos: ["images/reps3a.jpeg"],
         description: "Famerenana ary fanomanana ny konseritra izay ho ataon'ny Feo Iray indray amin'ny 06 Septambra 2026"
     },
+    {
+        id: 10,
+        titre: "Feo Iray est de Retour",
+        date: "06 septembre 2026",
+        statut: "futur",
+        photos: [""],
+        description: "Concert homanina mandritra ny grande vacances 2026 entina hanamarihana ny fiverenan'ny FI Gospel"
+    }
 ];
