@@ -254,3 +254,44 @@ button{
     50%, 95%  { opacity: 1; }
     100%      { opacity: 0; }
   }
+.sous-titre-evenement{
+    color:#000b50;
+    margin: 25px 0 15px;
+    font-size: 20px;
+}
+
+.liste-evenements{
+    display:flex;
+    flex-direction:column;
+    gap:20px;
+    margin-bottom:20px;
+}
+
+.evenement{
+    background:#f5f6fa;
+    border-radius:12px;
+    padding:15px;
+    text-align:center;
+}
+
+.evenement img{
+    width:100%;
+    max-width:280px;
+    height:180px;
+    object-fit:cover;
+    border-radius:10px;
+    margin-bottom:10px;
+}
+
+.evenement h4{
+    color:#000b50;
+    font-size:18px;
+    margin-bottom:5px;
+}
+
+.date-evenement{
+    color:#233cff;
+    font-weight:bold;
+    font-size:14px;
+    margin-bottom:8px;
+  }
