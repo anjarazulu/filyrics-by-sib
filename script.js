@@ -59,6 +59,7 @@ function afficherGalerie(push = true) {
     main.innerHTML = contenu;
     if (push) history.pushState({ view: "galerie" }, "", "#galerie");
 }
+
 function afficherEvenements(push = true) {
     const passes = evenements.filter(e => e.statut === "passe");
     const futurs = evenements.filter(e => e.statut === "futur");
@@ -98,8 +99,40 @@ function afficherEvenements(push = true) {
     if (push) history.pushState({ view: "evenements" }, "", "#evenements");
 }
 
-history.replaceState({ view: "accueil" }, "", "#accueil");
+// Affiche la bonne vue selon le hash présent dans l'URL au chargement
+// (au lieu de toujours revenir à l'accueil quand on actualise la page)
+function initDepuisHash() {
+    const hash = location.hash.replace("#", "");
 
+    if (hash.startsWith("chant-")) {
+        const id = Number(hash.replace("chant-", ""));
+        const existe = chants.some(c => c.id === id);
+        if (existe) {
+            afficherChant(id, false);
+            history.replaceState({ view: "chant", id }, "", "#chant-" + id);
+            return;
+        }
+    } else if (hash === "paroles") {
+        afficherParoles(false);
+        history.replaceState({ view: "paroles" }, "", "#paroles");
+        return;
+    } else if (hash === "galerie") {
+        afficherGalerie(false);
+        history.replaceState({ view: "galerie" }, "", "#galerie");
+        return;
+    } else if (hash === "evenements") {
+        afficherEvenements(false);
+        history.replaceState({ view: "evenements" }, "", "#evenements");
+        return;
+    }
+
+    // Aucun hash reconnu (ou vide) : on reste sur l'accueil déjà affiché
+    history.replaceState({ view: "accueil" }, "", "#accueil");
+}
+
+initDepuisHash();
+
+// Gère le bouton retour physique / navigateur
 window.addEventListener("popstate", (e) => {
     const state = e.state;
     if (!state || state.view === "accueil") {
@@ -111,7 +144,7 @@ window.addEventListener("popstate", (e) => {
     } else if (state.view === "galerie") {
         afficherGalerie(false);
     } else if (state.view === "evenements") {
-    afficherEvenements(false);
+        afficherEvenements(false);
     }
 });
 
@@ -140,7 +173,6 @@ document.addEventListener("click", function (e) {
     } else if (texte.includes("galerie")) {
         afficherGalerie();
     } else if (texte.includes("événement")) {
-    afficherEvenements();
+        afficherEvenements();
     }
 });
-        
