@@ -59,6 +59,44 @@ function afficherGalerie(push = true) {
     main.innerHTML = contenu;
     if (push) history.pushState({ view: "galerie" }, "", "#galerie");
 }
+function afficherEvenements(push = true) {
+    const passes = evenements.filter(e => e.statut === "passe");
+    const futurs = evenements.filter(e => e.statut === "futur");
+
+    let contenu = `<h2>Événements</h2>`;
+
+    if (futurs.length > 0) {
+        contenu += `<h3 class="sous-titre-evenement">À venir</h3><div class="liste-evenements">`;
+        futurs.forEach(e => {
+            contenu += `
+            <div class="evenement">
+                <img src="${e.photo}" alt="${e.titre}" onerror="this.onerror=null; this.src='images/default.png';">
+                <h4>${e.titre}</h4>
+                <p class="date-evenement">${e.date}</p>
+                <p>${e.description}</p>
+            </div>`;
+        });
+        contenu += `</div>`;
+    }
+
+    if (passes.length > 0) {
+        contenu += `<h3 class="sous-titre-evenement">Passés</h3><div class="liste-evenements">`;
+        passes.forEach(e => {
+            contenu += `
+            <div class="evenement">
+                <img src="${e.photo}" alt="${e.titre}" onerror="this.onerror=null; this.src='images/default.png';">
+                <h4>${e.titre}</h4>
+                <p class="date-evenement">${e.date}</p>
+                <p>${e.description}</p>
+            </div>`;
+        });
+        contenu += `</div>`;
+    }
+
+    contenu += `<button data-action="accueil">Retour à l'accueil</button>`;
+    main.innerHTML = contenu;
+    if (push) history.pushState({ view: "evenements" }, "", "#evenements");
+}
 
 history.replaceState({ view: "accueil" }, "", "#accueil");
 
@@ -72,6 +110,9 @@ window.addEventListener("popstate", (e) => {
         afficherChant(state.id, false);
     } else if (state.view === "galerie") {
         afficherGalerie(false);
+    }
+    } else if (state.view === "evenements") {
+    afficherEvenements(false);
     }
 });
 
@@ -99,6 +140,8 @@ document.addEventListener("click", function (e) {
         afficherParoles();
     } else if (texte.includes("galerie")) {
         afficherGalerie();
+    } else if (texte.includes("événement")) {
+    afficherEvenements();
     }
 });
         
