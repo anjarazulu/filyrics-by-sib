@@ -241,11 +241,11 @@ button{
     border: 3px solid #000b50;
 }
 .photo-secondaire{
-    animation: fondu-photo 6s infinite;
+    animation: fondu-photo 13s infinite;
 }
 
 @keyframes fondu-photo {
-    0%, 40%   { opacity: 0; }
-    50%, 90%  { opacity: 1; }
+    0%, 45%   { opacity: 0; }
+    50%, 95%  { opacity: 1; }
     100%      { opacity: 0; }
   }
