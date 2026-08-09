@@ -224,53 +224,6 @@ Fa isika izao mifankatia araky ny Teniny
 "Mba ho iray ihany izy rehetra", izany no aoka hitoetra`
     },
     {
-        id: 10,
-        titre: "Iray",
-        auteur: "Arson Nicolas",
-        compositeur: "Arson Nicolas",
-        tonalite: "C / Am",
-        paroles: `Tsy asiana fetra, tsy ho rava intsony
-Fa mitohy ety, ka hatrany Aminao
-Ho iray tokoa, hanao izay soa
-Ho any Aminao, Ray ô
-Ny fiderana no mampiray
-Ny fitiavanao tsy hiala aminay
-Ka ho tonga hery, tsy hisy ho very
-Fa eo an-tananao 'zahay
-
-Feo Iray, fo mifandray
-No entinay hiderana Anao
-Izahay ho hiray, ho mandrakizay
-Ka hatrary ankoatra ary
-Manana Anao hiaro ny dia
-
-Ny sakana tsy hisy intsony
-Manana Anao ny fonay ho tony
-Izay rehetra atao, hampifandray
-Ka fo, fanahy ho iray
-Isaoranay Ianao ry Ray
-Nanome 'lay talenta soa ho anay
-Entinay hidera, hanandratra Anao
-Ka manomboka eto dia efa Anao
-
-Feo Iray, fo mifandray
-No entinay hiderana Anao
-Izahay ho hiray, ho mandrakizay
-Ka hatrary ankoatra ary
-Manana Anao hiaro ny dia
-
-Ka ho rava ny efitra
-Nampisaraka hatrizay
-Ka miombona indray ho iray izahay
-Ho ao Aminao, ho mandrakizay
-
-Feo Iray, fo mifandray
-No entinay hiderana Anao
-Izahay ho hiray, ho mandrakizay
-Ka hatrary ankoatra ary
-Manana Anao hiaro ny dia`
-    },
-    {
         id: 11,
         titre: "Asandratro",
         auteur: "Arson Nicolas",
