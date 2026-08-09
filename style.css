@@ -128,7 +128,6 @@ button{
     margin-top:8px;
 }
 
-/* --- Galerie --- */
 .galerie{
     display:flex;
     flex-wrap:wrap;
@@ -171,7 +170,7 @@ button{
     height:36px;
     padding:0;
     margin:8px auto 0;
-    font-size:14px;
+    font-size:9px;
     border-radius:50%;
     background:transparent;
     color:#000b50;
@@ -189,10 +188,10 @@ button{
 .description-membre{
     margin-top:10px;
     padding:12px 16px;
-    font-size: 9px;
+    font-size: 5px;
     line-height:1.5;
     color:#333;
-    font-style: italic;
+    font-style: none;
     text-align:left;
     background:#f5f6fa;
     border-left:3px solid #000b50;
