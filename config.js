@@ -5,6 +5,6 @@
 // dans Supabase).
 
 const SUPABASE_URL = "https://ivgelvrbrvetqjbpypwz.supabase.co";
-const SUPABASE_KEY = "sb_publishable_0ym1XOZtDQVDKO7D2iKP5g_YOP0htX-";
+const SUPABASE_KEY = "sb_publishable_Oym1XOZtDQVDKO7D2iKP5g_YOP0htX-";
 
 const sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
