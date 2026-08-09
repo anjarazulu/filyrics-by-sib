@@ -407,12 +407,24 @@ function afficherConnexion(push = true) {
             <input type="email" name="email" required>
         </label>
         <label>Mot de passe
-            <input type="password" name="motdepasse" required>
+            <span class="champ-mdp">
+                <input type="password" name="motdepasse" id="champ-motdepasse" required>
+                <button type="button" id="toggle-mdp" aria-label="Afficher le mot de passe">👁</button>
+            </span>
         </label>
         <p class="erreur-form" id="erreur-connexion"></p>
         <button type="submit" class="btn-admin">Se connecter</button>
         <button type="button" data-action="accueil">Annuler</button>
     </form>`;
+
+    document.getElementById("toggle-mdp").addEventListener("click", () => {
+        const champ = document.getElementById("champ-motdepasse");
+        const bouton = document.getElementById("toggle-mdp");
+        const visible = champ.type === "text";
+        champ.type = visible ? "password" : "text";
+        bouton.textContent = visible ? "👁" : "🙈";
+        bouton.setAttribute("aria-label", visible ? "Afficher le mot de passe" : "Masquer le mot de passe");
+    });
 
     document.getElementById("form-connexion").addEventListener("submit", async (e) => {
         e.preventDefault();
