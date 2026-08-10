@@ -341,7 +341,7 @@ function afficherEvenements(push = true) {
 
     const rendreBloc = (e, estProchain = false) => `
         <div class="evenement ${estProchain ? "evenement-prochain" : ""}">
-            ${estProchain ? `<span class="badge-prochain">🔜 Prochain événement</span>` : ""}
+            ${estProchain ? `<span class="badge-prochain">Prochain événement</span>` : ""}
             ${genererCarrouselPhotos(e)}
             <h4>${e.titre}</h4>
             <p class="date-evenement">${e.date_evenement || ""}</p>
