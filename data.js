@@ -31,6 +31,66 @@ async function chargerEvenements() {
     return data;
 }
 
+// ---------- Compteur de vues ----------
+// Incrémente le nombre de vues d'un chant. "vuesActuelles" est la valeur
+// connue avant l'incrément (pour éviter un aller-retour supplémentaire).
+async function incrementerVues(id, vuesActuelles) {
+    const { error } = await sb.from("chants").update({ vues: (vuesActuelles || 0) + 1 }).eq("id", id);
+    if (error) {
+        console.error("Erreur incrémentation vues:", error);
+    }
+}
+
+// ---------- Compression d'image ----------
+// Redimensionne et recompresse une image côté navigateur avant l'upload,
+// mais seulement si elle est assez grande pour que ça vaille le coup et
+// seulement si le résultat est effectivement plus léger (sinon on garde
+// l'original pour ne jamais perdre en qualité inutilement).
+function compresserImage(fichier, dimensionMax = 1600, qualite = 0.85) {
+    return new Promise((resolve) => {
+        if (!fichier || !fichier.type || !fichier.type.startsWith("image/") || fichier.type === "image/svg+xml") {
+            resolve(fichier);
+            return;
+        }
+        // En dessous de ce poids, l'image est déjà légère : pas besoin de compresser.
+        if (fichier.size < 700 * 1024) {
+            resolve(fichier);
+            return;
+        }
+        const lecteur = new FileReader();
+        lecteur.onload = (e) => {
+            const img = new Image();
+            img.onload = () => {
+                let { width, height } = img;
+                if (width > dimensionMax || height > dimensionMax) {
+                    if (width > height) {
+                        height = Math.round(height * (dimensionMax / width));
+                        width = dimensionMax;
+                    } else {
+                        width = Math.round(width * (dimensionMax / height));
+                        height = dimensionMax;
+                    }
+                }
+                const canvas = document.createElement("canvas");
+                canvas.width = width;
+                canvas.height = height;
+                canvas.getContext("2d").drawImage(img, 0, 0, width, height);
+                canvas.toBlob((blob) => {
+                    if (!blob || blob.size >= fichier.size) {
+                        resolve(fichier); // la compression n'aide pas ici, on garde l'original
+                        return;
+                    }
+                    resolve(new File([blob], fichier.name, { type: "image/jpeg" }));
+                }, "image/jpeg", qualite);
+            };
+            img.onerror = () => resolve(fichier);
+            img.src = e.target.result;
+        };
+        lecteur.onerror = () => resolve(fichier);
+        lecteur.readAsDataURL(fichier);
+    });
+}
+
 // ---------- Upload de photo ----------
 // Envoie un fichier dans le bucket "photos" et renvoie son URL publique.
 async function uploaderPhoto(fichier) {
@@ -96,4 +156,4 @@ async function modifierEvenement(id, evenement) {
 async function supprimerEvenement(id) {
     const { error } = await sb.from("evenements").delete().eq("id", id);
     if (error) throw error;
-}
+            }
