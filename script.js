@@ -484,3 +484,171 @@ async function gererSuppressionEvenement(id) {
 
 // ---------------------------------------------------------------------
 // CONNEXION ADMIN
+// ---------------------------------------------------------------------
+
+function afficherConnexion(push = true) {
+    main.innerHTML = `
+    <h2>Connexion</h2>
+    <form id="form-connexion" class="form-admin">
+        <label>Email
+            <input type="email" name="email" required>
+        </label>
+        <label>Mot de passe
+            <span class="champ-mdp">
+                <input type="password" name="motdepasse" id="champ-motdepasse" required>
+                <button type="button" id="toggle-mdp" aria-label="Afficher le mot de passe">👁</button>
+            </span>
+        </label>
+        <p class="erreur-form" id="erreur-connexion"></p>
+        <button type="submit" class="btn-admin">Se connecter</button>
+        <button type="button" data-action="accueil">Annuler</button>
+    </form>`;
+
+    document.getElementById("toggle-mdp").addEventListener("click", () => {
+        const champ = document.getElementById("champ-motdepasse");
+        const bouton = document.getElementById("toggle-mdp");
+        const visible = champ.type === "text";
+        champ.type = visible ? "password" : "text";
+        bouton.textContent = visible ? "👁" : "🙈";
+        bouton.setAttribute("aria-label", visible ? "Afficher le mot de passe" : "Masquer le mot de passe");
+    });
+
+    document.getElementById("form-connexion").addEventListener("submit", async (e) => {
+        e.preventDefault();
+        const fd = new FormData(e.target);
+        const resultat = await seConnecter(fd.get("email").trim(), fd.get("motdepasse"));
+        if (resultat.succes) {
+            afficherAccueil();
+        } else {
+            document.getElementById("erreur-connexion").textContent = resultat.message;
+        }
+    });
+
+    if (push) history.pushState({ view: "connexion" }, "", "#connexion");
+}
+
+function onChangementConnexion() {
+    const lien = document.getElementById("lien-connexion");
+    if (!lien) return;
+    lien.textContent = estConnecte() ? "Déconnexion" : "Connexion";
+}
+
+// ---------------------------------------------------------------------
+// UTILITAIRE
+// ---------------------------------------------------------------------
+
+function echapper(texte) {
+    return String(texte).replace(/"/g, "&quot;");
+}
+
+// ---------------------------------------------------------------------
+// ROUTAGE
+// ---------------------------------------------------------------------
+
+function initDepuisHash() {
+    const hash = location.hash.replace("#", "");
+
+    if (hash.startsWith("chant-")) {
+        const id = Number(hash.replace("chant-", ""));
+        const existe = chants.some(c => c.id === id);
+        if (existe) {
+            afficherChant(id, false);
+            history.replaceState({ view: "chant", id }, "", "#chant-" + id);
+            return;
+        }
+    } else if (hash === "paroles") {
+        afficherParoles(false);
+        history.replaceState({ view: "paroles" }, "", "#paroles");
+        return;
+    } else if (hash === "galerie") {
+        afficherGalerie(false);
+        history.replaceState({ view: "galerie" }, "", "#galerie");
+        return;
+    } else if (hash === "evenements") {
+        afficherEvenements(false);
+        history.replaceState({ view: "evenements" }, "", "#evenements");
+        return;
+    }
+
+    afficherAccueil(false);
+    history.replaceState({ view: "accueil" }, "", "#accueil");
+}
+
+window.addEventListener("popstate", (e) => {
+    const state = e.state;
+    if (!state || state.view === "accueil") {
+        afficherAccueil(false);
+    } else if (state.view === "paroles") {
+        afficherParoles(false);
+    } else if (state.view === "chant") {
+        afficherChant(state.id, false);
+    } else if (state.view === "galerie") {
+        afficherGalerie(false);
+    } else if (state.view === "evenements") {
+        afficherEvenements(false);
+    } else if (state.view === "connexion") {
+        afficherConnexion(false);
+    }
+});
+
+document.addEventListener("click", function (e) {
+    const lienConnexion = e.target.closest("#lien-connexion");
+    if (lienConnexion) {
+        e.preventDefault();
+        if (estConnecte()) {
+            seDeconnecter().then(() => afficherAccueil());
+        } else {
+            afficherConnexion();
+        }
+        return;
+    }
+
+    const btn = e.target.closest("button");
+    if (!btn) return;
+
+    const texte = btn.textContent.trim().toLowerCase();
+
+    if (btn.classList.contains("toggle-description")) {
+        const index = btn.dataset.index;
+        const descDiv = document.getElementById(`description-${index}`);
+        const estOuvert = descDiv.classList.toggle("ouvert");
+        btn.textContent = estOuvert ? "▴" : "▾";
+        return;
+    }
+
+    const action = btn.dataset.action;
+    const id = btn.dataset.id ? Number(btn.dataset.id) : null;
+
+    if (action === "chant") afficherChant(id);
+    else if (action === "paroles") afficherParoles();
+    else if (action === "accueil") afficherAccueil();
+    else if (action === "galerie") afficherGalerie();
+    else if (action === "evenements") afficherEvenements();
+    else if (action === "form-chant") afficherFormulaireChant(id);
+    else if (action === "supprimer-chant") gererSuppressionChant(id);
+    else if (action === "form-membre") afficherFormulaireMembre(id);
+    else if (action === "supprimer-membre") gererSuppressionMembre(id);
+    else if (action === "form-evenement") afficherFormulaireEvenement(id);
+    else if (action === "supprimer-evenement") gererSuppressionEvenement(id);
+    else if (texte.includes("parole")) afficherParoles();
+    else if (texte.includes("galerie")) afficherGalerie();
+    else if (texte.includes("événement")) afficherEvenements();
+});
+
+// ---------------------------------------------------------------------
+// DEMARRAGE
+// ---------------------------------------------------------------------
+
+async function demarrer() {
+    main.innerHTML = `
+        <div class="chargement">
+            <div class="spinner"></div>
+            <p>Chargement...</p>
+        </div>`;
+    await initAuth();
+    await actualiserDonnees();
+    onChangementConnexion();
+    initDepuisHash();
+}
+
+demarrer();
