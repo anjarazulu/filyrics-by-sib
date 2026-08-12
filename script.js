@@ -522,7 +522,7 @@ function afficherHierarchie(push = true) {
     const chefsDePupitre = membres.filter(m => m.niveau === 2);
     const choristes = membres.filter(m => m.niveau === 3 || !m.niveau);
 
-    const ordrePupitres = ["Soprano", "Alto", "Tenor", "Basse"];
+    const ordrePupitres = ["Soprano", "Alto", "Tenor", "Musicien"];
     const pupitresPresents = ordrePupitres.filter(p =>
         chefsDePupitre.some(m => m.pupitre === p) || choristes.some(m => m.pupitre === p)
     );
