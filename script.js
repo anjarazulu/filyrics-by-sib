@@ -545,15 +545,15 @@ function afficherHierarchie(push = true) {
         if (pupitresPresents.length > 0) {
             contenu += `<div class="pupitres-hierarchie">`;
             pupitresPresents.forEach(pupitre => {
-                const chef = chefsDePupitre.find(m => m.pupitre === pupitre);
+                const chefsPupitre = chefsDePupitre.filter(m => m.pupitre === pupitre);
                 const membresPupitre = choristes.filter(m => m.pupitre === pupitre);
-                if (chef) marquer(chef);
+                chefsPupitre.forEach(marquer);
                 membresPupitre.forEach(marquer);
 
                 contenu += `
                 <div class="colonne-pupitre">
                     <h3>${pupitre === "Tenor" ? "Ténor" : pupitre}</h3>
-                    ${chef ? `<div class="niveau-hierarchie niveau-chef">${carteMembre(chef)}</div>` : ""}
+                    ${chefsPupitre.length > 0 ? `<div class="niveau-hierarchie niveau-chef">${chefsPupitre.map(carteMembre).join("")}</div>` : ""}
                     <div class="niveau-hierarchie niveau-choristes">
                         ${membresPupitre.map(carteMembre).join("")}
                     </div>
