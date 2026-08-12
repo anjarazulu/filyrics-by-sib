@@ -518,7 +518,10 @@ function carteMembre(membre) {
 }
 
 function afficherHierarchie(push = true) {
-    const direction = membres.filter(m => m.niveau === 1);
+    const idsAffiches = new Set();
+    const marquer = (m) => { idsAffiches.add(m.id); return m; };
+
+    const direction = membres.filter(m => m.niveau === 1).map(marquer);
     const chefsDePupitre = membres.filter(m => m.niveau === 2);
     const choristes = membres.filter(m => m.niveau === 3 || !m.niveau);
 
@@ -526,7 +529,6 @@ function afficherHierarchie(push = true) {
     const pupitresPresents = ordrePupitres.filter(p =>
         chefsDePupitre.some(m => m.pupitre === p) || choristes.some(m => m.pupitre === p)
     );
-    const sansPupitre = choristes.filter(m => !m.pupitre || !ordrePupitres.includes(m.pupitre));
 
     let contenu = `<h2>Hiérarchie et rôles</h2>`;
 
@@ -545,6 +547,8 @@ function afficherHierarchie(push = true) {
             pupitresPresents.forEach(pupitre => {
                 const chef = chefsDePupitre.find(m => m.pupitre === pupitre);
                 const membresPupitre = choristes.filter(m => m.pupitre === pupitre);
+                if (chef) marquer(chef);
+                membresPupitre.forEach(marquer);
 
                 contenu += `
                 <div class="colonne-pupitre">
@@ -558,11 +562,15 @@ function afficherHierarchie(push = true) {
             contenu += `</div>`;
         }
 
-        if (sansPupitre.length > 0) {
+        // Filet de sécurité : tout membre non encore affiché (pupitre vide,
+        // pupitre inconnu, niveau incohérent...) est quand même montré ici,
+        // pour qu'aucun membre ne disparaisse jamais de la page.
+        const restants = membres.filter(m => !idsAffiches.has(m.id));
+        if (restants.length > 0) {
             contenu += `
             <h3 class="sous-titre-evenement">Autres membres</h3>
             <div class="niveau-hierarchie niveau-choristes">
-                ${sansPupitre.map(carteMembre).join("")}
+                ${restants.map(carteMembre).join("")}
             </div>`;
         }
     }
