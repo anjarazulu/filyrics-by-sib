@@ -611,28 +611,6 @@ footer a#lien-connexion{
     margin:0;
 }
 
-.pupitres-hierarchie{
-    display:flex;
-    justify-content:center;
-    flex-wrap:wrap;
-    gap:24px;
-    border-top:2px dashed #ccc;
-    padding-top:20px;
-}
-
-.colonne-pupitre{
-    display:flex;
-    flex-direction:column;
-    align-items:center;
-    min-width:130px;
-}
-
-.colonne-pupitre h3{
-    color:#233cff;
-    font-size:16px;
-    margin-bottom:12px;
-}
-
 .niveau-chef .carte-hierarchie{
     border:2px solid #233cff;
 }
@@ -703,46 +681,23 @@ footer a#lien-connexion{
     padding:0;
 }
 
-/* ---- Bouton Infos persos (à côté du toggle description) ---- */
+/* ---- Badges de voix / instrument (galerie) ---- */
 
-.boutons-toggle{
+.badges-voix{
     display:flex;
+    flex-wrap:wrap;
     justify-content:center;
-    align-items:center;
-    gap:8px;
-    margin-top:8px;
+    gap:6px;
+    margin-top:6px;
 }
 
-.membre .toggle-description{
-    margin:0;
-}
-
-.toggle-infos-perso{
-    width:auto;
-    height:auto;
-    padding:8px 14px;
-    margin:0;
+.badge-voix{
+    display:inline-block;
+    background:#f5f6fa;
+    color:#000b50;
+    border:1px solid #000b50;
     font-size:11px;
-    border-radius:16px;
-    background:transparent;
-    color:#233cff;
-    border:1px solid #233cff;
-}
-.toggle-infos-perso:hover{
-    background:#233cff;
-    color:white;
-    transform:none;
-}
-
-.infos-perso-contenu p{
-    font-style:normal;
-    margin:0 0 6px;
-}
-.infos-perso-contenu p:last-child{
-    margin-bottom:0;
-}
-
-.chargement-infos-perso{
-    text-align:center;
-    color:#888;
+    font-weight:bold;
+    padding:3px 10px;
+    border-radius:12px;
 }
