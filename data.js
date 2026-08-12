@@ -142,27 +142,6 @@ async function supprimerMembre(id) {
     if (error) throw error;
 }
 
-// ---------- Infos personnelles (table séparée, lecture réservée aux connectés) ----------
-
-async function chargerInfoPerso(membreId) {
-    const { data, error } = await sb.from("infos_perso").select("*").eq("membre_id", membreId).maybeSingle();
-    if (error) {
-        console.error("Erreur chargement infos perso:", error);
-        return null;
-    }
-    return data;
-}
-
-// Crée ou met à jour en une seule fois (upsert) — évite d'avoir à savoir
-// si la fiche existe déjà pour ce membre.
-async function enregistrerInfoPerso(membreId, infos) {
-    const { error } = await sb.from("infos_perso").upsert(
-        { membre_id: membreId, ...infos },
-        { onConflict: "membre_id" }
-    );
-    if (error) throw error;
-}
-
 // ---------- Evenements ----------
 
 async function ajouterEvenement(evenement) {
