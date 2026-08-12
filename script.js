@@ -179,6 +179,34 @@ async function gererSuppressionChant(id) {
 // GALERIE (MEMBRES)
 // ---------------------------------------------------------------------
 
+function formaterDate(dateIso) {
+    if (!dateIso) return "";
+    const [annee, mois, jour] = dateIso.split("-");
+    return `${jour}/${mois}/${annee}`;
+}
+
+async function gererAffichageInfosPerso(membreId, index) {
+    const conteneur = document.getElementById(`infos-perso-contenu-${index}`);
+    const membre = membres.find(m => m.id === membreId);
+    const infos = await chargerInfoPerso(membreId);
+
+    if (!infos) {
+        conteneur.innerHTML = `<p class="chargement-infos-perso">Aucune information personnelle enregistrée.</p>`;
+        return;
+    }
+
+    conteneur.innerHTML = `
+        <p><strong>Nom :</strong> ${membre ? membre.nom : ""}</p>
+        <p><strong>Prénoms :</strong> ${infos.prenoms || ""}</p>
+        <p><strong>Date de naissance :</strong> ${formaterDate(infos.date_naissance)}</p>
+        <p><strong>Adresse :</strong> ${infos.adresse || ""}</p>
+        <p><strong>Contact :</strong> ${infos.contact || ""}</p>
+        <p><strong>Réseaux sociaux :</strong> ${infos.reseaux_sociaux || ""}</p>
+        <p><strong>Loisirs :</strong> ${infos.loisirs || ""}</p>
+        <p><strong>Description :</strong> ${membre && membre.description ? membre.description : ""}</p>
+    `;
+}
+
 function afficherGalerie(push = true) {
     let contenu = `<h2>Galerie</h2>`;
 
@@ -196,12 +224,22 @@ function afficherGalerie(push = true) {
                 ${membre.photo2 ? `<img class="photo-secondaire" src="${membre.photo2}" alt="${membre.nom}">` : ''}
             </div>
             <p>${membre.nom}</p>
-            <button class="toggle-description" data-index="${index}">▾</button>
+            <div class="boutons-toggle">
+                <button class="toggle-description" data-index="${index}">▾</button>
+                ${estConnecte() ? `<button class="toggle-infos-perso" data-index="${index}" data-id="${membre.id}">Infos persos</button>` : ""}
+            </div>
             <div class="description-membre" id="description-${index}">
                 <div class="description-inner">
                     <p>${membre.description || ""}</p>
                 </div>
             </div>
+            ${estConnecte() ? `
+                <div class="description-membre" id="infos-perso-${index}">
+                    <div class="description-inner infos-perso-contenu" id="infos-perso-contenu-${index}">
+                        <p class="chargement-infos-perso">Chargement...</p>
+                    </div>
+                </div>
+            ` : ""}
             ${estConnecte() ? `
                 <div class="actions-chant">
                     <button class="btn-admin btn-petit" data-action="form-membre" data-id="${membre.id}">Modifier</button>
@@ -216,8 +254,9 @@ function afficherGalerie(push = true) {
     if (push) history.pushState({ view: "galerie" }, "", "#galerie");
 }
 
-function afficherFormulaireMembre(id, push = true) {
+async function afficherFormulaireMembre(id, push = true) {
     const membre = id ? membres.find(m => m.id === id) : null;
+    const infosExistantes = id ? await chargerInfoPerso(id) : null;
 
     main.innerHTML = `
     <h2>${membre ? "Modifier le membre" : "Ajouter un membre"}</h2>
@@ -254,6 +293,27 @@ function afficherFormulaireMembre(id, push = true) {
                     ${v === "Tenor" ? "Ténor" : v}
                 </label>
             `).join("")}
+        </fieldset>
+        <fieldset class="cases-voix">
+            <legend>Informations personnelles (visibles uniquement par les comptes connectés)</legend>
+            <label>Prénoms
+                <input type="text" name="prenoms" value="${infosExistantes ? echapper(infosExistantes.prenoms || "") : ""}">
+            </label>
+            <label>Date de naissance
+                <input type="date" name="date_naissance" value="${infosExistantes && infosExistantes.date_naissance ? infosExistantes.date_naissance : ""}">
+            </label>
+            <label>Adresse
+                <input type="text" name="adresse" value="${infosExistantes ? echapper(infosExistantes.adresse || "") : ""}">
+            </label>
+            <label>Contact
+                <input type="text" name="contact" value="${infosExistantes ? echapper(infosExistantes.contact || "") : ""}">
+            </label>
+            <label>Nom sur réseaux sociaux (préciser le réseau entre parenthèses, ex : jean.rakoto (Facebook))
+                <input type="text" name="reseaux_sociaux" value="${infosExistantes ? echapper(infosExistantes.reseaux_sociaux || "") : ""}">
+            </label>
+            <label>Loisirs
+                <input type="text" name="loisirs" value="${infosExistantes ? echapper(infosExistantes.loisirs || "") : ""}">
+            </label>
         </fieldset>
         <p class="erreur-form" id="erreur-form-membre"></p>
         <button type="submit" class="btn-admin">${membre ? "Enregistrer" : "Ajouter"}</button>
@@ -308,11 +368,25 @@ function afficherFormulaireMembre(id, push = true) {
                 valeurs.photo2 = await uploaderPhoto(await compresserImage(fichierPhoto2));
             }
 
+            let idMembre;
             if (membre) {
                 await modifierMembre(membre.id, valeurs);
+                idMembre = membre.id;
             } else {
-                await ajouterMembre(valeurs);
+                const nouveauMembre = await ajouterMembre(valeurs);
+                idMembre = nouveauMembre.id;
             }
+
+            const infosPerso = {
+                prenoms: fd.get("prenoms").trim(),
+                date_naissance: fd.get("date_naissance") || null,
+                adresse: fd.get("adresse").trim(),
+                contact: fd.get("contact").trim(),
+                reseaux_sociaux: fd.get("reseaux_sociaux").trim(),
+                loisirs: fd.get("loisirs").trim()
+            };
+            await enregistrerInfoPerso(idMembre, infosPerso);
+
             await actualiserDonnees();
             afficherGalerie();
         } catch (err) {
@@ -737,6 +811,18 @@ document.addEventListener("click", function (e) {
         const descDiv = document.getElementById(`description-${index}`);
         const estOuvert = descDiv.classList.toggle("ouvert");
         btn.textContent = estOuvert ? "▴" : "▾";
+        return;
+    }
+
+    if (btn.classList.contains("toggle-infos-perso")) {
+        const index = btn.dataset.index;
+        const membreId = Number(btn.dataset.id);
+        const panneau = document.getElementById(`infos-perso-${index}`);
+        const estOuvert = panneau.classList.toggle("ouvert");
+        if (estOuvert && !panneau.dataset.charge) {
+            panneau.dataset.charge = "1";
+            gererAffichageInfosPerso(membreId, index);
+        }
         return;
     }
 
