@@ -637,6 +637,7 @@ footer a#lien-connexion{
 }
 
 .niveau-choristes{
+    text-align: center;
     gap:10px;
 }
 
