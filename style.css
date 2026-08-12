@@ -658,3 +658,47 @@ footer a#lien-connexion{
     font-style:italic;
     margin:10px auto 20px;
 }
+
+/* ---- Etiquettes de niveau hiérarchique ---- */
+
+.etiquette-niveau{
+    text-align:center;
+    color:#000b50;
+    font-weight:bold;
+    font-size:14px;
+    text-transform:uppercase;
+    letter-spacing:.5px;
+    margin:0 0 10px;
+}
+
+/* ---- Cases à cocher voix / instrument (formulaire) ---- */
+
+.cases-voix{
+    border:1px solid #ccc;
+    border-radius:8px;
+    padding:10px 14px;
+    display:flex;
+    flex-wrap:wrap;
+    gap:12px;
+}
+
+.cases-voix legend{
+    font-size:14px;
+    color:#000b50;
+    font-weight:bold;
+    padding:0 6px;
+}
+
+.case-voix{
+    display:flex !important;
+    flex-direction:row !important;
+    align-items:center;
+    gap:6px;
+    font-weight:normal !important;
+    font-size:14px;
+}
+
+.case-voix input{
+    width:auto;
+    padding:0;
+}
