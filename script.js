@@ -236,25 +236,25 @@ function afficherFormulaireMembre(id, push = true) {
         <label>Description
             <textarea name="description" rows="5">${membre ? membre.description || "" : ""}</textarea>
         </label>
-        <label>Rôle (ex : Chef de chœur, Choriste, Trésorier...)
+        <label>Rôle précis (ex : Trésorier, Chef de chœur, Ex-secrétaire...)
             <input type="text" name="role" value="${membre ? echapper(membre.role || "") : ""}">
         </label>
-        <label>Niveau hiérarchique
+        <label>Hiérarchie
             <select name="niveau">
-                <option value="1" ${membre && membre.niveau === 1 ? "selected" : ""}>1 — Direction</option>
-                <option value="2" ${membre && membre.niveau === 2 ? "selected" : ""}>2 — Chef de pupitre</option>
-                <option value="3" ${!membre || membre.niveau === 3 || !membre.niveau ? "selected" : ""}>3 — Choriste</option>
+                <option value="1" ${membre && membre.niveau === 1 ? "selected" : ""}>Fondateur</option>
+                <option value="2" ${membre && membre.niveau === 2 ? "selected" : ""}>Bureau</option>
+                <option value="3" ${!membre || membre.niveau === 3 || !membre.niveau ? "selected" : ""}>Membre</option>
             </select>
         </label>
-        <label>Pupitre (laisser vide pour la direction)
-            <select name="pupitre">
-                <option value="" ${membre && !membre.pupitre ? "selected" : ""}>—</option>
-                <option value="Soprano" ${membre && membre.pupitre === "Soprano" ? "selected" : ""}>Soprano</option>
-                <option value="Alto" ${membre && membre.pupitre === "Alto" ? "selected" : ""}>Alto</option>
-                <option value="Tenor" ${membre && membre.pupitre === "Tenor" ? "selected" : ""}>Ténor</option>
-                <option value="Musicien" ${membre && membre.pupitre === "Musicien" ? "selected" : ""}>Musicien</option>
-            </select>
-        </label>
+        <fieldset class="cases-voix">
+            <legend>Voix / instrument (plusieurs choix possibles)</legend>
+            ${["Soprano", "Alto", "Tenor", "Musicien"].map(v => `
+                <label class="case-voix">
+                    <input type="checkbox" name="voix" value="${v}" ${membre && membre.voix && membre.voix.includes(v) ? "checked" : ""}>
+                    ${v === "Tenor" ? "Ténor" : v}
+                </label>
+            `).join("")}
+        </fieldset>
         <p class="erreur-form" id="erreur-form-membre"></p>
         <button type="submit" class="btn-admin">${membre ? "Enregistrer" : "Ajouter"}</button>
         <button type="button" data-action="galerie">Annuler</button>
@@ -297,7 +297,7 @@ function afficherFormulaireMembre(id, push = true) {
                 description: fd.get("description"),
                 role: fd.get("role").trim(),
                 niveau: Number(fd.get("niveau")),
-                pupitre: fd.get("pupitre") || null
+                voix: fd.getAll("voix")
             };
             if (fichierPhoto && fichierPhoto.size > 0) {
                 valeurs.photo = await uploaderPhoto(await compresserImage(fichierPhoto));
@@ -518,61 +518,77 @@ function carteMembre(membre) {
 }
 
 function afficherHierarchie(push = true) {
-    const idsAffiches = new Set();
-    const marquer = (m) => { idsAffiches.add(m.id); return m; };
-
-    const direction = membres.filter(m => m.niveau === 1).map(marquer);
-    const chefsDePupitre = membres.filter(m => m.niveau === 2);
-    const choristes = membres.filter(m => m.niveau === 3 || !m.niveau);
-
-    const ordrePupitres = ["Soprano", "Alto", "Tenor", "Musicien"];
-    const pupitresPresents = ordrePupitres.filter(p =>
-        chefsDePupitre.some(m => m.pupitre === p) || choristes.some(m => m.pupitre === p)
-    );
+    // ---- Section 1 : hiérarchie (une personne = un seul niveau) ----
+    const fondateurs = membres.filter(m => m.niveau === 1);
+    const bureau = membres.filter(m => m.niveau === 2);
+    const membresSimples = membres.filter(m => m.niveau === 3 || !m.niveau);
 
     let contenu = `<h2>Hiérarchie et rôles</h2>`;
 
     if (membres.length === 0) {
         contenu += `<p class="aucun-resultat">Aucun membre enregistré pour le moment.</p>`;
-    } else {
-        if (direction.length > 0) {
+        main.innerHTML = contenu;
+        if (push) history.pushState({ view: "hierarchie" }, "", "#hierarchie");
+        return;
+    }
+
+    contenu += `<h3 class="sous-titre-evenement">Hiérarchie</h3>`;
+
+    if (fondateurs.length > 0) {
+        contenu += `
+        <p class="etiquette-niveau">Fondateurs</p>
+        <div class="niveau-hierarchie niveau-direction">
+            ${fondateurs.map(carteMembre).join("")}
+        </div>`;
+    }
+    if (bureau.length > 0) {
+        contenu += `
+        <p class="etiquette-niveau">Bureau</p>
+        <div class="niveau-hierarchie niveau-chef">
+            ${bureau.map(carteMembre).join("")}
+        </div>`;
+    }
+    if (membresSimples.length > 0) {
+        contenu += `
+        <p class="etiquette-niveau">Membres</p>
+        <div class="niveau-hierarchie niveau-choristes">
+            ${membresSimples.map(carteMembre).join("")}
+        </div>`;
+    }
+
+    // ---- Section 2 : classement par voix/instrument (indépendant du   ----
+    // ----   niveau — une même personne peut avoir plusieurs voix, et  ----
+    // ----   apparaître dans plusieurs colonnes en même temps)         ----
+    const ordreVoix = ["Soprano", "Alto", "Tenor", "Musicien"];
+    const voixPresentes = ordreVoix.filter(v => membres.some(m => m.voix && m.voix.includes(v)));
+    const sansVoix = membres.filter(m => !m.voix || m.voix.length === 0);
+
+    if (voixPresentes.length > 0 || sansVoix.length > 0) {
+        contenu += `<h3 class="sous-titre-evenement">Classement par voix / musicien</h3>`;
+        contenu += `<div class="pupitres-hierarchie">`;
+
+        voixPresentes.forEach(voix => {
+            const membresVoix = membres.filter(m => m.voix && m.voix.includes(voix));
             contenu += `
-            <div class="niveau-hierarchie niveau-direction">
-                ${direction.map(carteMembre).join("")}
+            <div class="colonne-pupitre">
+                <h3>${voix === "Tenor" ? "Ténor" : voix}</h3>
+                <div class="niveau-hierarchie niveau-choristes">
+                    ${membresVoix.map(carteMembre).join("")}
+                </div>
+            </div>`;
+        });
+
+        if (sansVoix.length > 0) {
+            contenu += `
+            <div class="colonne-pupitre">
+                <h3>Non classé</h3>
+                <div class="niveau-hierarchie niveau-choristes">
+                    ${sansVoix.map(carteMembre).join("")}
+                </div>
             </div>`;
         }
 
-        if (pupitresPresents.length > 0) {
-            contenu += `<div class="pupitres-hierarchie">`;
-            pupitresPresents.forEach(pupitre => {
-                const chefsPupitre = chefsDePupitre.filter(m => m.pupitre === pupitre);
-                const membresPupitre = choristes.filter(m => m.pupitre === pupitre);
-                chefsPupitre.forEach(marquer);
-                membresPupitre.forEach(marquer);
-
-                contenu += `
-                <div class="colonne-pupitre">
-                    <h3>${pupitre === "Tenor" ? "Ténor" : pupitre}</h3>
-                    ${chefsPupitre.length > 0 ? `<div class="niveau-hierarchie niveau-chef">${chefsPupitre.map(carteMembre).join("")}</div>` : ""}
-                    <div class="niveau-hierarchie niveau-choristes">
-                        ${membresPupitre.map(carteMembre).join("")}
-                    </div>
-                </div>`;
-            });
-            contenu += `</div>`;
-        }
-
-        // Filet de sécurité : tout membre non encore affiché (pupitre vide,
-        // pupitre inconnu, niveau incohérent...) est quand même montré ici,
-        // pour qu'aucun membre ne disparaisse jamais de la page.
-        const restants = membres.filter(m => !idsAffiches.has(m.id));
-        if (restants.length > 0) {
-            contenu += `
-            <h3 class="sous-titre-evenement">Autres membres</h3>
-            <div class="niveau-hierarchie niveau-choristes">
-                ${restants.map(carteMembre).join("")}
-            </div>`;
-        }
+        contenu += `</div>`;
     }
 
     if (estConnecte()) {
