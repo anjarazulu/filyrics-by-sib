@@ -252,7 +252,7 @@ function afficherFormulaireMembre(id, push = true) {
                 <option value="Soprano" ${membre && membre.pupitre === "Soprano" ? "selected" : ""}>Soprano</option>
                 <option value="Alto" ${membre && membre.pupitre === "Alto" ? "selected" : ""}>Alto</option>
                 <option value="Tenor" ${membre && membre.pupitre === "Tenor" ? "selected" : ""}>Ténor</option>
-                <option value="Basse" ${membre && membre.pupitre === "Basse" ? "selected" : ""}>Basse</option>
+                <option value="Musicien" ${membre && membre.pupitre === "Musicien" ? "selected" : ""}>Musicien</option>
             </select>
         </label>
         <p class="erreur-form" id="erreur-form-membre"></p>
