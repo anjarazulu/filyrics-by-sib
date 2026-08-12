@@ -555,11 +555,36 @@ function afficherHierarchie(push = true) {
         </div>`;
     }
     if (membresSimples.length > 0) {
-        contenu += `
-        <p class="etiquette-niveau">Membres</p>
-        <div class="niveau-hierarchie niveau-choristes">
-            ${membresSimples.map(carteMembre).join("")}
-        </div>`;
+        contenu += `<p class="etiquette-niveau">Membres</p>`;
+
+        const ordreVoix = ["Soprano", "Alto", "Tenor", "Musicien"];
+        const voixPresentes = ordreVoix.filter(v => membresSimples.some(m => m.voix && m.voix.includes(v)));
+        const sansVoix = membresSimples.filter(m => !m.voix || m.voix.length === 0);
+
+        contenu += `<div class="pupitres-hierarchie">`;
+
+        voixPresentes.forEach(voix => {
+            const membresVoix = membresSimples.filter(m => m.voix && m.voix.includes(voix));
+            contenu += `
+            <div class="colonne-pupitre">
+                <h3>${voix === "Tenor" ? "Ténor" : voix}</h3>
+                <div class="niveau-hierarchie niveau-choristes">
+                    ${membresVoix.map(carteMembre).join("")}
+                </div>
+            </div>`;
+        });
+
+        if (sansVoix.length > 0) {
+            contenu += `
+            <div class="colonne-pupitre">
+                <h3>Non classé</h3>
+                <div class="niveau-hierarchie niveau-choristes">
+                    ${sansVoix.map(carteMembre).join("")}
+                </div>
+            </div>`;
+        }
+
+        contenu += `</div>`;
     }
 
     if (estConnecte()) {
