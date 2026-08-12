@@ -236,6 +236,25 @@ function afficherFormulaireMembre(id, push = true) {
         <label>Description
             <textarea name="description" rows="5">${membre ? membre.description || "" : ""}</textarea>
         </label>
+        <label>Rôle (ex : Chef de chœur, Choriste, Trésorier...)
+            <input type="text" name="role" value="${membre ? echapper(membre.role || "") : ""}">
+        </label>
+        <label>Niveau hiérarchique
+            <select name="niveau">
+                <option value="1" ${membre && membre.niveau === 1 ? "selected" : ""}>1 — Direction</option>
+                <option value="2" ${membre && membre.niveau === 2 ? "selected" : ""}>2 — Chef de pupitre</option>
+                <option value="3" ${!membre || membre.niveau === 3 || !membre.niveau ? "selected" : ""}>3 — Choriste</option>
+            </select>
+        </label>
+        <label>Pupitre (laisser vide pour la direction)
+            <select name="pupitre">
+                <option value="" ${membre && !membre.pupitre ? "selected" : ""}>—</option>
+                <option value="Soprano" ${membre && membre.pupitre === "Soprano" ? "selected" : ""}>Soprano</option>
+                <option value="Alto" ${membre && membre.pupitre === "Alto" ? "selected" : ""}>Alto</option>
+                <option value="Tenor" ${membre && membre.pupitre === "Tenor" ? "selected" : ""}>Ténor</option>
+                <option value="Basse" ${membre && membre.pupitre === "Basse" ? "selected" : ""}>Basse</option>
+            </select>
+        </label>
         <p class="erreur-form" id="erreur-form-membre"></p>
         <button type="submit" class="btn-admin">${membre ? "Enregistrer" : "Ajouter"}</button>
         <button type="button" data-action="galerie">Annuler</button>
@@ -275,7 +294,10 @@ function afficherFormulaireMembre(id, push = true) {
         try {
             const valeurs = {
                 nom: nom,
-                description: fd.get("description")
+                description: fd.get("description"),
+                role: fd.get("role").trim(),
+                niveau: Number(fd.get("niveau")),
+                pupitre: fd.get("pupitre") || null
             };
             if (fichierPhoto && fichierPhoto.size > 0) {
                 valeurs.photo = await uploaderPhoto(await compresserImage(fichierPhoto));
@@ -483,6 +505,78 @@ async function gererSuppressionEvenement(id) {
 }
 
 // ---------------------------------------------------------------------
+// HIERARCHIE ET ROLES
+// ---------------------------------------------------------------------
+
+function carteMembre(membre) {
+    return `
+    <div class="carte-hierarchie">
+        <img src="${membre.photo || "images/default.png"}" alt="${membre.nom}" onerror="this.onerror=null; this.src='images/default.png';">
+        <p class="nom-hierarchie">${membre.nom}</p>
+        <p class="role-hierarchie">${membre.role || ""}</p>
+    </div>`;
+}
+
+function afficherHierarchie(push = true) {
+    const direction = membres.filter(m => m.niveau === 1);
+    const chefsDePupitre = membres.filter(m => m.niveau === 2);
+    const choristes = membres.filter(m => m.niveau === 3 || !m.niveau);
+
+    const ordrePupitres = ["Soprano", "Alto", "Tenor", "Basse"];
+    const pupitresPresents = ordrePupitres.filter(p =>
+        chefsDePupitre.some(m => m.pupitre === p) || choristes.some(m => m.pupitre === p)
+    );
+    const sansPupitre = choristes.filter(m => !m.pupitre || !ordrePupitres.includes(m.pupitre));
+
+    let contenu = `<h2>Hiérarchie et rôles</h2>`;
+
+    if (membres.length === 0) {
+        contenu += `<p class="aucun-resultat">Aucun membre enregistré pour le moment.</p>`;
+    } else {
+        if (direction.length > 0) {
+            contenu += `
+            <div class="niveau-hierarchie niveau-direction">
+                ${direction.map(carteMembre).join("")}
+            </div>`;
+        }
+
+        if (pupitresPresents.length > 0) {
+            contenu += `<div class="pupitres-hierarchie">`;
+            pupitresPresents.forEach(pupitre => {
+                const chef = chefsDePupitre.find(m => m.pupitre === pupitre);
+                const membresPupitre = choristes.filter(m => m.pupitre === pupitre);
+
+                contenu += `
+                <div class="colonne-pupitre">
+                    <h3>${pupitre === "Tenor" ? "Ténor" : pupitre}</h3>
+                    ${chef ? `<div class="niveau-hierarchie niveau-chef">${carteMembre(chef)}</div>` : ""}
+                    <div class="niveau-hierarchie niveau-choristes">
+                        ${membresPupitre.map(carteMembre).join("")}
+                    </div>
+                </div>`;
+            });
+            contenu += `</div>`;
+        }
+
+        if (sansPupitre.length > 0) {
+            contenu += `
+            <h3 class="sous-titre-evenement">Autres membres</h3>
+            <div class="niveau-hierarchie niveau-choristes">
+                ${sansPupitre.map(carteMembre).join("")}
+            </div>`;
+        }
+    }
+
+    if (estConnecte()) {
+        contenu += `<p class="astuce-admin">Pour modifier les rôles, niveaux et pupitres, va dans Galerie → Modifier un membre.</p>`;
+    }
+
+    contenu += `<button data-action="accueil">Retour à l'accueil</button>`;
+    main.innerHTML = contenu;
+    if (push) history.pushState({ view: "hierarchie" }, "", "#hierarchie");
+}
+
+// ---------------------------------------------------------------------
 // CONNEXION ADMIN
 // ---------------------------------------------------------------------
 
@@ -568,6 +662,10 @@ function initDepuisHash() {
         afficherEvenements(false);
         history.replaceState({ view: "evenements" }, "", "#evenements");
         return;
+    } else if (hash === "hierarchie") {
+        afficherHierarchie(false);
+        history.replaceState({ view: "hierarchie" }, "", "#hierarchie");
+        return;
     }
 
     afficherAccueil(false);
@@ -586,6 +684,8 @@ window.addEventListener("popstate", (e) => {
         afficherGalerie(false);
     } else if (state.view === "evenements") {
         afficherEvenements(false);
+    } else if (state.view === "hierarchie") {
+        afficherHierarchie(false);
     } else if (state.view === "connexion") {
         afficherConnexion(false);
     }
@@ -624,6 +724,7 @@ document.addEventListener("click", function (e) {
     else if (action === "accueil") afficherAccueil();
     else if (action === "galerie") afficherGalerie();
     else if (action === "evenements") afficherEvenements();
+    else if (action === "hierarchie") afficherHierarchie();
     else if (action === "form-chant") afficherFormulaireChant(id);
     else if (action === "supprimer-chant") gererSuppressionChant(id);
     else if (action === "form-membre") afficherFormulaireMembre(id);
