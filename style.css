@@ -702,3 +702,47 @@ footer a#lien-connexion{
     width:auto;
     padding:0;
 }
+
+/* ---- Bouton Infos persos (à côté du toggle description) ---- */
+
+.boutons-toggle{
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    gap:8px;
+    margin-top:8px;
+}
+
+.membre .toggle-description{
+    margin:0;
+}
+
+.toggle-infos-perso{
+    width:auto;
+    height:auto;
+    padding:8px 14px;
+    margin:0;
+    font-size:11px;
+    border-radius:16px;
+    background:transparent;
+    color:#233cff;
+    border:1px solid #233cff;
+}
+.toggle-infos-perso:hover{
+    background:#233cff;
+    color:white;
+    transform:none;
+}
+
+.infos-perso-contenu p{
+    font-style:normal;
+    margin:0 0 6px;
+}
+.infos-perso-contenu p:last-child{
+    margin-bottom:0;
+}
+
+.chargement-infos-perso{
+    text-align:center;
+    color:#888;
+}
