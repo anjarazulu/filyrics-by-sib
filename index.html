@@ -33,6 +33,21 @@
       <p>&copy; 2026 Anjaraniaina Si♭</p>
       <p><a href="#" id="lien-connexion">Connexion</a></p>
    </footer>
+
+   <div id="offline-overlay">
+      <div class="mascotte-hors-ligne">
+         <svg viewBox="0 0 120 140" xmlns="http://www.w3.org/2000/svg">
+            <path class="fantome-corps" d="M60 5 C25 5 8 30 8 65 L8 120 C8 120 18 108 28 120 C38 132 48 108 60 120 C72 132 82 108 92 120 C102 108 112 120 112 120 L112 65 C112 30 95 5 60 5 Z"/>
+            <circle class="fantome-oeil" cx="42" cy="60" r="7"/>
+            <circle class="fantome-oeil" cx="78" cy="60" r="7"/>
+            <path class="fantome-bouche" d="M48 82 Q60 92 72 82" fill="none" stroke-width="4" stroke-linecap="round"/>
+         </svg>
+      </div>
+      <p class="offline-titre">Oups, pas de connexion&nbsp;!</p>
+      <p class="offline-texte">Vérifie ton réseau, le fantôme attend patiemment pour recharger tes chants ✨</p>
+      <button id="offline-retry" type="button">Réessayer</button>
+   </div>
+
    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
    <script src="config.js"></script>
    <script src="auth.js"></script>
