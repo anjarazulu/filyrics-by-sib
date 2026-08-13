@@ -735,6 +735,13 @@ document.addEventListener("click", function (e) {
         const descDiv = document.getElementById(`description-${index}`);
         const estOuvert = descDiv.classList.toggle("ouvert");
         btn.textContent = estOuvert ? "▴" : "▾";
+        if (estOuvert) {
+            // hauteur calculée dynamiquement pour s'adapter à n'importe
+            // quelle longueur de description (plus de limite fixe)
+            descDiv.style.maxHeight = descDiv.scrollHeight + "px";
+        } else {
+            descDiv.style.maxHeight = "";
+        }
         return;
     }
 
@@ -757,6 +764,44 @@ document.addEventListener("click", function (e) {
     else if (texte.includes("galerie")) afficherGalerie();
     else if (texte.includes("événement")) afficherEvenements();
 });
+
+// ---------------------------------------------------------------------
+// HORS LIGNE
+// ---------------------------------------------------------------------
+
+const offlineOverlay = document.getElementById("offline-overlay");
+const offlineRetryBtn = document.getElementById("offline-retry");
+
+function afficherOverlayHorsLigne() {
+    if (offlineOverlay) offlineOverlay.classList.add("visible");
+}
+
+function masquerOverlayHorsLigne() {
+    if (offlineOverlay) offlineOverlay.classList.remove("visible");
+}
+
+async function tenterReconnexion() {
+    if (offlineRetryBtn) {
+        offlineRetryBtn.disabled = true;
+        offlineRetryBtn.textContent = "Vérification...";
+    }
+    await actualiserDonnees(); // masque/affiche l'overlay selon le résultat
+    if (!offlineOverlay.classList.contains("visible")) {
+        // la reconnexion a réussi : on rafraîchit la vue actuelle avec les données à jour
+        initDepuisHash();
+    }
+    if (offlineRetryBtn) {
+        offlineRetryBtn.disabled = false;
+        offlineRetryBtn.textContent = "Réessayer";
+    }
+}
+
+window.addEventListener("offline", afficherOverlayHorsLigne);
+// Le fait d'avoir un réseau ("online") ne garantit pas que Supabase répond ;
+// on relance donc un vrai chargement plutôt que de juste cacher l'overlay.
+window.addEventListener("online", tenterReconnexion);
+if (offlineRetryBtn) offlineRetryBtn.addEventListener("click", tenterReconnexion);
+if (!navigator.onLine) afficherOverlayHorsLigne();
 
 // ---------------------------------------------------------------------
 // DEMARRAGE
