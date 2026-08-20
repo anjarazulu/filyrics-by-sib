@@ -771,6 +771,7 @@ document.addEventListener("click", function (e) {
 
 const offlineOverlay = document.getElementById("offline-overlay");
 const offlineRetryBtn = document.getElementById("offline-retry");
+const offlineFermerBtn = document.getElementById("offline-fermer");
 
 function afficherOverlayHorsLigne() {
     if (offlineOverlay) offlineOverlay.classList.add("visible");
@@ -801,6 +802,9 @@ window.addEventListener("offline", afficherOverlayHorsLigne);
 // on relance donc un vrai chargement plutôt que de juste cacher l'overlay.
 window.addEventListener("online", tenterReconnexion);
 if (offlineRetryBtn) offlineRetryBtn.addEventListener("click", tenterReconnexion);
+// Le bandeau est informatif : on peut le fermer et continuer à utiliser le
+// site normalement avec les données déjà en cache.
+if (offlineFermerBtn) offlineFermerBtn.addEventListener("click", masquerOverlayHorsLigne);
 if (!navigator.onLine) afficherOverlayHorsLigne();
 
 // ---------------------------------------------------------------------
