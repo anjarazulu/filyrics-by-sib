@@ -4,12 +4,36 @@
 
 // ---------- Lecture ----------
 
+// ---------- Cache local (pour l'accès hors-ligne) ----------
+// À chaque chargement réussi, on garde une copie locale des données.
+// Si Supabase est injoignable (pas de réseau, serveur en panne...), on sert
+// cette dernière copie connue plutôt que de bloquer l'appli.
+function sauvegarderCacheLocal(cle, donnees) {
+    try {
+        localStorage.setItem(cle, JSON.stringify(donnees));
+    } catch (e) {
+        // stockage plein ou indisponible : pas grave, on continue sans cache
+    }
+}
+
+function lireCacheLocal(cle) {
+    try {
+        const brut = localStorage.getItem(cle);
+        return brut ? JSON.parse(brut) : [];
+    } catch (e) {
+        return [];
+    }
+}
+
 async function chargerChants() {
     const { data, error } = await sb.from("chants").select("*").order("id");
     if (error) {
         console.error("Erreur chargement chants:", error);
-        return [];
+        if (typeof afficherOverlayHorsLigne === "function") afficherOverlayHorsLigne();
+        return lireCacheLocal("cache_chants");
     }
+    sauvegarderCacheLocal("cache_chants", data);
+    if (typeof masquerOverlayHorsLigne === "function") masquerOverlayHorsLigne();
     return data;
 }
 
@@ -17,8 +41,11 @@ async function chargerMembres() {
     const { data, error } = await sb.from("membres").select("*").order("id");
     if (error) {
         console.error("Erreur chargement membres:", error);
-        return [];
+        if (typeof afficherOverlayHorsLigne === "function") afficherOverlayHorsLigne();
+        return lireCacheLocal("cache_membres");
     }
+    sauvegarderCacheLocal("cache_membres", data);
+    if (typeof masquerOverlayHorsLigne === "function") masquerOverlayHorsLigne();
     return data;
 }
 
@@ -26,8 +53,11 @@ async function chargerEvenements() {
     const { data, error } = await sb.from("evenements").select("*").order("id");
     if (error) {
         console.error("Erreur chargement evenements:", error);
-        return [];
+        if (typeof afficherOverlayHorsLigne === "function") afficherOverlayHorsLigne();
+        return lireCacheLocal("cache_evenements");
     }
+    sauvegarderCacheLocal("cache_evenements", data);
+    if (typeof masquerOverlayHorsLigne === "function") masquerOverlayHorsLigne();
     return data;
 }
 
