@@ -760,18 +760,25 @@ footer a#lien-connexion{
    OVERLAY HORS LIGNE
 --------------------------------------------------------------------- */
 
+/* Bandeau discret (PAS un overlay bloquant) : reste en haut de l'écran,
+   n'empêche jamais de consulter ou naviguer sur le site. Les données déjà
+   chargées (cache local + fichiers mis en cache par le service worker)
+   restent utilisables hors ligne. */
 #offline-overlay{
     display:none;
     position:fixed;
-    inset:0;
+    top:0;
+    left:0;
+    right:0;
     z-index:9999;
     background:#000b50;
     color:#fff;
-    flex-direction:column;
     align-items:center;
     justify-content:center;
-    text-align:center;
-    padding:24px;
+    gap:12px;
+    text-align:left;
+    padding:8px 44px 8px 14px;
+    box-shadow:0 2px 8px rgba(0,0,0,.25);
 }
 
 #offline-overlay.visible{
@@ -779,9 +786,9 @@ footer a#lien-connexion{
 }
 
 .mascotte-hors-ligne{
-    width:110px;
-    height:130px;
-    margin-bottom:18px;
+    width:34px;
+    height:40px;
+    flex-shrink:0;
     animation:flotter 2.6s ease-in-out infinite;
 }
 
@@ -807,7 +814,7 @@ footer a#lien-connexion{
 
 @keyframes flotter{
     0%, 100%{ transform:translateY(0); }
-    50%{ transform:translateY(-12px); }
+    50%{ transform:translateY(-4px); }
 }
 
 @keyframes clignoter{
@@ -815,19 +822,12 @@ footer a#lien-connexion{
     96%{ transform:scaleY(0.1); }
 }
 
-.offline-titre{
-    font-size:20px;
-    font-weight:bold;
-    margin:0 0 8px;
-    color:#ffe84f;
-}
-
 .offline-texte{
-    font-size:14px;
-    max-width:320px;
-    line-height:1.5;
-    margin:0 0 20px;
+    font-size:13px;
+    line-height:1.4;
+    margin:0;
     color:#e6e9ff;
+    flex:1;
 }
 
 #offline-retry{
@@ -835,12 +835,28 @@ footer a#lien-connexion{
     color:#000b50;
     border:none;
     font-weight:bold;
-    padding:10px 26px;
-    border-radius:24px;
-    font-size:15px;
+    padding:6px 16px;
+    border-radius:18px;
+    font-size:13px;
     cursor:pointer;
+    flex-shrink:0;
 }
 
 #offline-retry:hover{
     background:#fff3a3;
 }
+
+#offline-fermer{
+    position:absolute;
+    top:6px;
+    right:10px;
+    background:none;
+    border:none;
+    color:#e6e9ff;
+    font-size:16px;
+    cursor:pointer;
+    line-height:1;
+}
+
+/* Le contenu de la page n'a plus besoin d'être repoussé sous le bandeau :
+   celui-ci est volontairement fin et ne recouvre que le haut de l'écran. */
