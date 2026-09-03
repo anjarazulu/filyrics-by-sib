@@ -121,20 +121,28 @@ function compresserImage(fichier, dimensionMax = 1600, qualite = 0.85) {
     });
 }
 
-// ---------- Upload de photo ----------
-// Envoie un fichier dans le bucket "photos" et renvoie son URL publique.
-async function uploaderPhoto(fichier) {
+// ---------- Upload de fichier (générique) ----------
+// Envoie un fichier dans le bucket Supabase Storage indiqué et renvoie son URL
+// publique. Utilisé pour les photos (bucket "photos") et pour les fichiers
+// audio des chants (bucket "audio" — à créer dans Supabase Storage, en public).
+async function uploaderFichier(fichier, bucket) {
     const extension = fichier.name.split(".").pop();
     const nomFichier = `${Date.now()}-${Math.random().toString(36).slice(2, 8)}.${extension}`;
 
-    const { error } = await sb.storage.from("photos").upload(nomFichier, fichier);
+    const { error } = await sb.storage.from(bucket).upload(nomFichier, fichier);
     if (error) {
-        console.error("Erreur upload photo:", error);
+        console.error(`Erreur upload (${bucket}):`, error);
         throw error;
     }
 
-    const { data } = sb.storage.from("photos").getPublicUrl(nomFichier);
+    const { data } = sb.storage.from(bucket).getPublicUrl(nomFichier);
     return data.publicUrl;
+}
+
+// ---------- Upload de photo ----------
+// Envoie un fichier dans le bucket "photos" et renvoie son URL publique.
+async function uploaderPhoto(fichier) {
+    return uploaderFichier(fichier, "photos");
 }
 
 // ---------- Chants ----------
