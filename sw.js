@@ -4,7 +4,7 @@
 // locales) — jamais les requêtes vers Supabase, pour que les chants,
 // membres et événements restent toujours à jour dès qu'il y a du réseau.
 
-const CACHE_NAME = "FILyrics-v4";
+const CACHE_NAME = "FILyrics-v5";
 
 const FICHIERS_A_METTRE_EN_CACHE = [
     "./",
