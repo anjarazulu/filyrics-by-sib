@@ -56,6 +56,101 @@ function rendreListeChants(filtre = "") {
         </div>`).join("");
 }
 
+// ---------- Blocs de paroles (couplet / refrain / bridge) ----------
+// Les paroles sont stockées en base comme un simple texte (colonne "paroles"),
+// mais structuré avec des balises de section du type "[Couplet]", "[Refrain]"
+// ou "[Bridge]" en début de ligne. Cela évite toute migration de la base de
+// données tout en permettant un éditeur par blocs côté admin et un affichage
+// stylé par type de section côté lecture.
+
+const TYPES_BLOC_PAROLES = ["Couplet", "Refrain", "Bridge"];
+
+function echapperHTML(texte) {
+    return String(texte || "")
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;");
+}
+
+// Transforme le texte brut stocké en base en tableau de blocs { type, contenu }.
+function parserParoles(texte) {
+    const brut = String(texte || "").replace(/\r\n/g, "\n").trim();
+    if (!brut) return [];
+
+    const regexBalise = /^\[(Couplet|Refrain|Bridge)\]\s*$/i;
+    const lignes = brut.split("\n");
+
+    // Si aucune balise n'est présente (anciens chants enregistrés avant cette
+    // fonctionnalité), on traite tout le texte comme un unique couplet afin
+    // de ne rien perdre et de rester rétro-compatible.
+    if (!lignes.some(l => regexBalise.test(l.trim()))) {
+        return [{ type: "Couplet", contenu: brut }];
+    }
+
+    const blocs = [];
+    let blocCourant = null;
+
+    lignes.forEach(ligne => {
+        const correspondance = ligne.trim().match(regexBalise);
+        if (correspondance) {
+            if (blocCourant) blocs.push(blocCourant);
+            const type = TYPES_BLOC_PAROLES.find(t => t.toLowerCase() === correspondance[1].toLowerCase());
+            blocCourant = { type, contenu: "" };
+        } else if (blocCourant) {
+            blocCourant.contenu += (blocCourant.contenu ? "\n" : "") + ligne;
+        }
+        // les lignes avant la toute première balise (rares) sont ignorées
+    });
+    if (blocCourant) blocs.push(blocCourant);
+
+    return blocs
+        .map(b => ({ type: b.type, contenu: b.contenu.trim() }))
+        .filter(b => b.contenu);
+}
+
+// Reconstruit le texte à stocker en base à partir du tableau de blocs.
+function serialiserBlocsParoles(blocs) {
+    return blocs
+        .filter(b => b.contenu && b.contenu.trim())
+        .map(b => `[${b.type}]\n${b.contenu.trim()}`)
+        .join("\n\n");
+}
+
+// Construit le HTML affiché sur la page de lecture d'un chant, avec un style
+// distinct par type de section. Les couplets sont numérotés automatiquement
+// selon leur ordre d'apparition.
+function rendreParolesHTML(texte) {
+    const blocs = parserParoles(texte);
+    if (blocs.length === 0) return "";
+
+    let compteurCouplet = 0;
+
+    return blocs.map(bloc => {
+        let classe = "couplet";
+        let etiquette = bloc.type;
+
+        if (bloc.type === "Couplet") {
+            compteurCouplet++;
+            classe = "couplet";
+            etiquette = `Couplet ${compteurCouplet}`;
+        } else if (bloc.type === "Refrain") {
+            classe = "refrain";
+            etiquette = "Refrain";
+        } else if (bloc.type === "Bridge") {
+            classe = "bridge";
+            etiquette = "Bridge";
+        }
+
+        const contenuHTML = echapperHTML(bloc.contenu).replace(/\n/g, "<br>");
+
+        return `
+        <div class="section-parole ${classe}">
+            <span class="etiquette-section">${etiquette}</span>
+            <div class="contenu-section">${contenuHTML}</div>
+        </div>`;
+    }).join("");
+}
+
 function afficherParoles(push = true) {
     let contenu = `
         <h2>Liste des chants</h2>
@@ -94,7 +189,7 @@ function afficherChant(id, push = true) {
         <p><strong>Auteur :</strong> ${chant.auteur || ""}</p>
         <p><strong>Compositeur :</strong> ${chant.compositeur || ""}</p>
         <p><strong>Tonalité :</strong> ${chant.tonalite || ""}</p>
-        <p class="paroles">${chant.paroles || ""}</p>
+        <div class="paroles">${rendreParolesHTML(chant.paroles)}</div>
         ${estConnecte() ? `
             <div class="actions-chant" style="justify-content:center;">
                 <button class="btn-admin btn-petit" data-action="form-chant" data-id="${chant.id}">Modifier</button>
@@ -108,6 +203,11 @@ function afficherChant(id, push = true) {
 
 function afficherFormulaireChant(id, push = true) {
     const chant = id ? chants.find(c => c.id === id) : null;
+
+    // État local de l'éditeur par blocs : tableau de { type, contenu }.
+    // Pré-rempli à partir des paroles existantes (ou un couplet vide par défaut).
+    let blocsParoles = chant ? parserParoles(chant.paroles) : [];
+    if (blocsParoles.length === 0) blocsParoles = [{ type: "Couplet", contenu: "" }];
 
     main.innerHTML = `
     <h2>${chant ? "Modifier le chant" : "Ajouter un chant"}</h2>
@@ -124,33 +224,81 @@ function afficherFormulaireChant(id, push = true) {
         <label>Tonalité
             <input type="text" name="tonalite" value="${chant ? echapper(chant.tonalite || "") : ""}">
         </label>
-        <label>Paroles
-            <textarea name="paroles" rows="10" required>${chant ? chant.paroles || "" : ""}</textarea>
-        </label>
+        <div class="champ-paroles">
+            <span class="libelle-paroles">Paroles</span>
+            <div id="blocs-paroles"></div>
+            <div class="actions-blocs">
+                <button type="button" class="btn-petit btn-ajouter-bloc" data-type="Couplet">+ Couplet</button>
+                <button type="button" class="btn-petit btn-ajouter-bloc" data-type="Refrain">+ Refrain</button>
+                <button type="button" class="btn-petit btn-ajouter-bloc" data-type="Bridge">+ Bridge</button>
+            </div>
+        </div>
         <p class="erreur-form" id="erreur-form-chant"></p>
         <button type="submit" class="btn-admin">${chant ? "Enregistrer" : "Ajouter"}</button>
         <button type="button" data-action="paroles">Annuler</button>
     </form>`;
+
+    const conteneurBlocs = document.getElementById("blocs-paroles");
+
+    function rendreBlocsParoles() {
+        conteneurBlocs.innerHTML = blocsParoles.map((bloc, index) => `
+            <div class="bloc-parole" data-index="${index}">
+                <div class="bloc-parole-entete">
+                    <span class="bloc-parole-type bloc-type-${bloc.type.toLowerCase()}">${bloc.type}</span>
+                    ${blocsParoles.length > 1 ? `
+                        <button type="button" class="retirer-bloc" data-index="${index}" aria-label="Retirer ce bloc" title="Retirer ce bloc">✕</button>
+                    ` : ""}
+                </div>
+                <textarea class="bloc-parole-texte" data-index="${index}" rows="4" placeholder="Écris le texte du ${bloc.type.toLowerCase()} ici...">${echapperHTML(bloc.contenu)}</textarea>
+            </div>
+        `).join("");
+
+        conteneurBlocs.querySelectorAll(".bloc-parole-texte").forEach(champ => {
+            champ.addEventListener("input", (e) => {
+                blocsParoles[Number(e.target.dataset.index)].contenu = e.target.value;
+            });
+        });
+
+        conteneurBlocs.querySelectorAll(".retirer-bloc").forEach(bouton => {
+            bouton.addEventListener("click", (e) => {
+                blocsParoles.splice(Number(e.target.dataset.index), 1);
+                rendreBlocsParoles();
+            });
+        });
+    }
+
+    rendreBlocsParoles();
+
+    document.querySelectorAll(".btn-ajouter-bloc").forEach(bouton => {
+        bouton.addEventListener("click", () => {
+            blocsParoles.push({ type: bouton.dataset.type, contenu: "" });
+            rendreBlocsParoles();
+            // on amène l'utilisateur directement au dernier bloc ajouté
+            const derniereTextarea = conteneurBlocs.querySelector(".bloc-parole:last-child .bloc-parole-texte");
+            if (derniereTextarea) derniereTextarea.focus();
+        });
+    });
 
     document.getElementById("form-chant").addEventListener("submit", async (e) => {
         e.preventDefault();
         const zoneErreur = document.getElementById("erreur-form-chant");
         zoneErreur.textContent = "";
         const fd = new FormData(e.target);
+        const paroles = serialiserBlocsParoles(blocsParoles);
         const valeurs = {
             titre: fd.get("titre").trim(),
             auteur: fd.get("auteur").trim(),
             compositeur: fd.get("compositeur").trim(),
             tonalite: fd.get("tonalite").trim(),
-            paroles: fd.get("paroles")
+            paroles
         };
 
         if (!valeurs.titre) {
             zoneErreur.textContent = "Le titre ne peut pas être vide.";
             return;
         }
-        if (!fd.get("paroles") || !fd.get("paroles").trim()) {
-            zoneErreur.textContent = "Les paroles ne peuvent pas être vides.";
+        if (!paroles) {
+            zoneErreur.textContent = "Les paroles ne peuvent pas être vides : remplis au moins un bloc.";
             return;
         }
 
