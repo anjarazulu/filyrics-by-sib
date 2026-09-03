@@ -114,9 +114,163 @@ footer a:hover{
 }
 
 .paroles{
-    white-space:pre-line;
     line-height:1.7;
     margin:20px 0 35px;
+    text-align:left;
+}
+
+/* ---- Sections de paroles : couplet / refrain / bridge ---- */
+.section-parole{
+    margin-bottom:20px;
+}
+
+.section-parole .contenu-section{
+    white-space:pre-line;
+}
+
+.etiquette-section{
+    display:block;
+    font-size:11px;
+    text-transform:uppercase;
+    letter-spacing:.6px;
+    font-weight:bold;
+    margin-bottom:6px;
+}
+
+.section-parole.couplet{
+    color:#333;
+}
+
+.section-parole.couplet .etiquette-section{
+    color:#233cff;
+}
+
+.section-parole.refrain{
+    color:#000b50;
+    font-weight:bold;
+    background:#f5f6fa;
+    border-left:4px solid #ffe84f;
+    padding:12px 16px;
+    border-radius:0 10px 10px 0;
+}
+
+.section-parole.refrain .etiquette-section{
+    color:#000b50;
+}
+
+.section-parole.bridge{
+    color:#233cff;
+    font-style:italic;
+    border-left:4px solid #233cff;
+    padding-left:16px;
+}
+
+.section-parole.bridge .etiquette-section{
+    color:#233cff;
+}
+
+/* ---- Éditeur de paroles par blocs (formulaire admin) ---- */
+.champ-paroles{
+    display:flex;
+    flex-direction:column;
+    gap:10px;
+}
+
+.libelle-paroles{
+    font-size:14px;
+    color:#000b50;
+    font-weight:bold;
+}
+
+#blocs-paroles{
+    display:flex;
+    flex-direction:column;
+    gap:12px;
+}
+
+.bloc-parole{
+    border:1px solid #ddd;
+    border-radius:10px;
+    padding:12px;
+    background:#fafbfe;
+}
+
+.bloc-parole-entete{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    margin-bottom:8px;
+}
+
+.bloc-parole-type{
+    font-size:11px;
+    text-transform:uppercase;
+    letter-spacing:.5px;
+    font-weight:bold;
+    padding:4px 10px;
+    border-radius:12px;
+    color:white;
+    background:#233cff;
+}
+
+.bloc-parole-type.bloc-type-refrain{
+    background:#ffe84f;
+    color:#000b50;
+}
+
+.bloc-parole-type.bloc-type-bridge{
+    background:#000b50;
+}
+
+.retirer-bloc{
+    width:26px;
+    height:26px;
+    padding:0;
+    margin:0;
+    border-radius:50%;
+    background:#c0392b;
+    color:white;
+    font-size:13px;
+    border:none;
+}
+
+.retirer-bloc:hover{
+    background:#e74c3c;
+    transform:none;
+}
+
+.bloc-parole-texte{
+    width:100%;
+    font-family:inherit;
+    font-size:15px;
+    padding:10px 12px;
+    border:1px solid #ccc;
+    border-radius:8px;
+    resize:vertical;
+}
+
+.actions-blocs{
+    display:flex;
+    flex-wrap:wrap;
+    gap:8px;
+}
+
+.btn-ajouter-bloc{
+    width:auto;
+    height:auto;
+    padding:8px 14px;
+    font-size:13px;
+    border-radius:16px;
+    background:#f0f1f5;
+    color:#000b50;
+    border:1px solid #000b50;
+    margin:0;
+}
+
+.btn-ajouter-bloc:hover{
+    background:#000b50;
+    color:white;
+    transform:none;
 }
 
 button{
