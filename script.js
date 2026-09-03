@@ -33,11 +33,19 @@ function normaliserTexte(texte) {
         .replace(/[\u0300-\u036f]/g, ""); // retire les accents pour une recherche plus tolérante
 }
 
-function rendreListeChants(filtre = "") {
+function rendreListeChants(filtre = "", champRecherche = "tout") {
     const filtreNormalise = normaliserTexte(filtre);
-    const chantsFiltres = filtreNormalise
-        ? chants.filter(c => normaliserTexte(c.titre).includes(filtreNormalise) || normaliserTexte(c.auteur).includes(filtreNormalise))
-        : chants;
+
+    const chantsFiltres = !filtreNormalise ? chants : chants.filter(chant => {
+        const titre = normaliserTexte(chant.titre);
+        const auteurCompositeur = normaliserTexte(`${chant.auteur || ""} ${chant.compositeur || ""}`);
+        const paroles = normaliserTexte(retirerAccords(chant.paroles));
+
+        if (champRecherche === "titre") return titre.includes(filtreNormalise);
+        if (champRecherche === "auteur") return auteurCompositeur.includes(filtreNormalise);
+        if (champRecherche === "paroles") return paroles.includes(filtreNormalise);
+        return titre.includes(filtreNormalise) || auteurCompositeur.includes(filtreNormalise) || paroles.includes(filtreNormalise);
+    });
 
     if (chantsFiltres.length === 0) {
         return `<p class="aucun-resultat">Aucun chant ne correspond à ta recherche.</p>`;
@@ -45,7 +53,7 @@ function rendreListeChants(filtre = "") {
 
     return chantsFiltres.map(chant => `
         <div class="chant">
-            <h3>${chant.titre} <span class="badge-vues" title="Nombre de vues">👁 ${chant.vues || 0}</span></h3>
+            <h3>${echapperHTML(chant.titre)} ${estConnecte() ? `<span class="badge-vues" title="Nombre de vues">${chant.vues || 0} vue${(chant.vues || 0) > 1 ? "s" : ""}</span>` : ""}</h3>
             <div class="actions-chant">
                 <button data-action="chant" data-id="${chant.id}">Lire les paroles</button>
                 ${estConnecte() ? `
@@ -65,11 +73,64 @@ function rendreListeChants(filtre = "") {
 
 const TYPES_BLOC_PAROLES = ["Couplet", "Refrain", "Bridge"];
 
+// Échappement HTML complet (contenu ET attributs) : protège contre l'injection
+// de balises via un titre, un nom, une description... saisis par un admin ou
+// mal formatés. À utiliser systématiquement autour de tout texte venant de la
+// base de données avant de l'insérer dans innerHTML.
 function echapperHTML(texte) {
-    return String(texte || "")
+    return String(texte ?? "")
         .replace(/&/g, "&amp;")
         .replace(/</g, "&lt;")
-        .replace(/>/g, "&gt;");
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#39;");
+}
+
+// ---------- Accords (au-dessus des paroles) ----------
+// Un accord est stocké directement dans le texte d'un bloc, juste avant la
+// lettre/le mot où il doit apparaître, sous la forme "[NomAccord]" (ex :
+// "Voa[C]hy ny [G]fiadanana"). Comme un accord est toujours à l'intérieur
+// d'une ligne (jamais seul sur sa propre ligne), il ne peut pas être confondu
+// avec une balise de section ("[Couplet]", "[Refrain]", "[Bridge]"), qui elle
+// occupe toujours une ligne entière.
+
+// Sépare une ligne de paroles en { ligneNettoyee, accords } où accords est un
+// tableau de { position, nom } : position = index du caractère (dans la ligne
+// nettoyée) juste avant lequel l'accord doit être affiché.
+function analyserLigneAccords(ligne) {
+    const regex = /\[([^\[\]]+)\]/g;
+    let correspondance;
+    let dernierIndex = 0;
+    let ligneNettoyee = "";
+    const accords = [];
+
+    while ((correspondance = regex.exec(ligne)) !== null) {
+        ligneNettoyee += ligne.slice(dernierIndex, correspondance.index);
+        accords.push({ position: ligneNettoyee.length, nom: correspondance[1].trim() });
+        dernierIndex = regex.lastIndex;
+    }
+    ligneNettoyee += ligne.slice(dernierIndex);
+
+    return { ligneNettoyee, accords };
+}
+
+// Retire uniquement les balises d'accords d'un texte (utilisé pour la
+// recherche dans les paroles, où les noms d'accords ne doivent pas polluer
+// les résultats).
+function retirerAccords(texte) {
+    return String(texte || "").replace(/\[([^\[\]]+)\]/g, "");
+}
+
+// Construit la ligne de texte (espaces compris) à afficher au-dessus de la
+// ligne de paroles, chaque accord étant positionné au bon endroit.
+function construireLigneAccordsTexte(accords) {
+    let ligne = "";
+    accords.forEach(accord => {
+        while (ligne.length < accord.position) ligne += " ";
+        if (ligne.length > accord.position) ligne += " "; // évite de coller deux accords
+        ligne += accord.nom;
+    });
+    return ligne;
 }
 
 // Transforme le texte brut stocké en base en tableau de blocs { type, contenu }.
@@ -118,8 +179,10 @@ function serialiserBlocsParoles(blocs) {
 
 // Construit le HTML affiché sur la page de lecture d'un chant, avec un style
 // distinct par type de section. Les couplets sont numérotés automatiquement
-// selon leur ordre d'apparition.
-function rendreParolesHTML(texte) {
+// selon leur ordre d'apparition. Si "avecAccords" est vrai, chaque ligne
+// contenant des accords est affichée sur deux lignes (accords / paroles),
+// avec une police à chasse fixe pour garder l'alignement.
+function rendreParolesHTML(texte, avecAccords = false) {
     const blocs = parserParoles(texte);
     if (blocs.length === 0) return "";
 
@@ -141,12 +204,32 @@ function rendreParolesHTML(texte) {
             etiquette = "Bridge";
         }
 
-        const contenuHTML = echapperHTML(bloc.contenu).replace(/\n/g, "<br>");
+        const lignes = bloc.contenu.split("\n");
+        let contenuHTML;
+
+        if (avecAccords) {
+            contenuHTML = lignes.map(ligne => {
+                const { ligneNettoyee, accords } = analyserLigneAccords(ligne);
+                const texteLigne = echapperHTML(ligneNettoyee) || "&nbsp;";
+                if (accords.length === 0) {
+                    return `<div class="ligne-parole"><div class="ligne-texte">${texteLigne}</div></div>`;
+                }
+                const texteAccords = echapperHTML(construireLigneAccordsTexte(accords));
+                return `<div class="ligne-parole">
+                    <div class="ligne-accords">${texteAccords}</div>
+                    <div class="ligne-texte">${texteLigne}</div>
+                </div>`;
+            }).join("");
+        } else {
+            contenuHTML = lignes
+                .map(ligne => echapperHTML(analyserLigneAccords(ligne).ligneNettoyee))
+                .join("<br>");
+        }
 
         return `
         <div class="section-parole ${classe}">
             <span class="etiquette-section">${etiquette}</span>
-            <div class="contenu-section">${contenuHTML}</div>
+            <div class="contenu-section${avecAccords ? " avec-accords" : ""}">${contenuHTML}</div>
         </div>`;
     }).join("");
 }
@@ -155,7 +238,15 @@ function afficherParoles(push = true) {
     let contenu = `
         <h2>Liste des chants</h2>
         <div class="mini-loader"><span></span><span></span><span></span></div>
-        <input type="search" id="recherche-chants" class="barre-recherche" placeholder="🔎 Rechercher un chant...">
+        <div class="zone-recherche">
+            <input type="search" id="recherche-chants" class="barre-recherche" placeholder="Rechercher un chant...">
+            <select id="champ-recherche" class="select-recherche">
+                <option value="tout">Tout</option>
+                <option value="titre">Titre</option>
+                <option value="auteur">Auteur / Compositeur</option>
+                <option value="paroles">Paroles</option>
+            </select>
+        </div>
     `;
 
     if (estConnecte()) {
@@ -166,9 +257,15 @@ function afficherParoles(push = true) {
     contenu += `<button data-action="accueil">Retour à l'accueil</button>`;
     main.innerHTML = contenu;
 
-    document.getElementById("recherche-chants").addEventListener("input", (e) => {
-        document.getElementById("liste-chants").innerHTML = rendreListeChants(e.target.value);
-    });
+    const champRecherche = document.getElementById("recherche-chants");
+    const selectChamp = document.getElementById("champ-recherche");
+
+    function rafraichirListe() {
+        document.getElementById("liste-chants").innerHTML = rendreListeChants(champRecherche.value, selectChamp.value);
+    }
+
+    champRecherche.addEventListener("input", rafraichirListe);
+    selectChamp.addEventListener("change", rafraichirListe);
 
     if (push) history.pushState({ view: "paroles" }, "", "#paroles");
 }
@@ -181,15 +278,28 @@ function afficherChant(id, push = true) {
     chant.vues = vuesAvant + 1;
     incrementerVues(id, vuesAvant); // mise à jour en base, en arrière-plan
 
+    // Un bouton "Afficher les accords" est toujours proposé ; il n'a d'effet
+    // visuel que si des accords ont été renseignés dans les paroles. L'état
+    // repart à "masqué" à chaque ouverture de chant.
+    let accordsVisibles = false;
+
     main.innerHTML = `
     <section class="page-chant">
-        <h2>${chant.titre}</h2>
+        <h2>${echapperHTML(chant.titre)}</h2>
         <div class="mini-loader"><span></span><span></span><span></span></div>
-        <p class="compteur-vues">👁 ${chant.vues} vue${chant.vues > 1 ? "s" : ""}</p>
-        <p><strong>Auteur :</strong> ${chant.auteur || ""}</p>
-        <p><strong>Compositeur :</strong> ${chant.compositeur || ""}</p>
-        <p><strong>Tonalité :</strong> ${chant.tonalite || ""}</p>
-        <div class="paroles">${rendreParolesHTML(chant.paroles)}</div>
+        ${estConnecte() ? `<p class="compteur-vues">${chant.vues} vue${chant.vues > 1 ? "s" : ""}</p>` : ""}
+        <p><strong>Auteur :</strong> ${echapperHTML(chant.auteur || "")}</p>
+        <p><strong>Compositeur :</strong> ${echapperHTML(chant.compositeur || "")}</p>
+        <p><strong>Tonalité :</strong> ${echapperHTML(chant.tonalite || "")}</p>
+        ${chant.audio ? `
+            <div class="lecteur-audio-conteneur">
+                <audio controls preload="none" class="lecteur-audio" src="${echapperHTML(chant.audio)}"></audio>
+            </div>
+        ` : ""}
+        <div class="barre-outils-paroles">
+            <button type="button" id="toggle-accords" class="btn-petit btn-toggle-accords">Afficher les accords</button>
+        </div>
+        <div class="paroles" id="zone-paroles">${rendreParolesHTML(chant.paroles, accordsVisibles)}</div>
         ${estConnecte() ? `
             <div class="actions-chant" style="justify-content:center;">
                 <button class="btn-admin btn-petit" data-action="form-chant" data-id="${chant.id}">Modifier</button>
@@ -198,6 +308,15 @@ function afficherChant(id, push = true) {
         ` : ""}
         <button data-action="paroles">Retour aux paroles</button>
     </section>`;
+
+    const boutonAccords = document.getElementById("toggle-accords");
+    boutonAccords.addEventListener("click", () => {
+        accordsVisibles = !accordsVisibles;
+        boutonAccords.textContent = accordsVisibles ? "Masquer les accords" : "Afficher les accords";
+        boutonAccords.classList.toggle("actif", accordsVisibles);
+        document.getElementById("zone-paroles").innerHTML = rendreParolesHTML(chant.paroles, accordsVisibles);
+    });
+
     if (push) history.pushState({ view: "chant", id }, "", "#chant-" + id);
 }
 
@@ -208,6 +327,8 @@ function afficherFormulaireChant(id, push = true) {
     // Pré-rempli à partir des paroles existantes (ou un couplet vide par défaut).
     let blocsParoles = chant ? parserParoles(chant.paroles) : [];
     if (blocsParoles.length === 0) blocsParoles = [{ type: "Couplet", contenu: "" }];
+
+    let indexBlocGlisse = null; // index du bloc en cours de glisser-déposer
 
     main.innerHTML = `
     <h2>${chant ? "Modifier le chant" : "Ajouter un chant"}</h2>
@@ -224,8 +345,21 @@ function afficherFormulaireChant(id, push = true) {
         <label>Tonalité
             <input type="text" name="tonalite" value="${chant ? echapper(chant.tonalite || "") : ""}">
         </label>
+        <label>Fichier audio ${chant && chant.audio ? "(laisser vide pour garder l'audio actuel)" : "(optionnel)"}
+            <input type="file" name="audio" accept="audio/*">
+        </label>
+        ${chant && chant.audio ? `
+            <div class="apercu-actuel apercu-audio">
+                <audio controls preload="none" src="${echapperHTML(chant.audio)}"></audio>
+                <label class="case-retirer-audio">
+                    <input type="checkbox" name="supprimer_audio">
+                    Retirer l'audio actuel
+                </label>
+            </div>
+        ` : ""}
         <div class="champ-paroles">
             <span class="libelle-paroles">Paroles</span>
+            <p class="aide-champ">Glisse-dépose les blocs pour réordonner les sections. Pour ajouter un accord, place le curseur dans le texte à l'endroit voulu, indique son nom, puis clique sur "Insérer".</p>
             <div id="blocs-paroles"></div>
             <div class="actions-blocs">
                 <button type="button" class="btn-petit btn-ajouter-bloc" data-type="Couplet">+ Couplet</button>
@@ -242,14 +376,19 @@ function afficherFormulaireChant(id, push = true) {
 
     function rendreBlocsParoles() {
         conteneurBlocs.innerHTML = blocsParoles.map((bloc, index) => `
-            <div class="bloc-parole" data-index="${index}">
+            <div class="bloc-parole" data-index="${index}" draggable="true">
                 <div class="bloc-parole-entete">
+                    <span class="poignee-glisser" title="Glisser pour réordonner" aria-hidden="true">⠿</span>
                     <span class="bloc-parole-type bloc-type-${bloc.type.toLowerCase()}">${bloc.type}</span>
                     ${blocsParoles.length > 1 ? `
-                        <button type="button" class="retirer-bloc" data-index="${index}" aria-label="Retirer ce bloc" title="Retirer ce bloc">✕</button>
+                        <button type="button" class="retirer-bloc" data-index="${index}" aria-label="Retirer ce bloc" title="Retirer ce bloc">×</button>
                     ` : ""}
                 </div>
                 <textarea class="bloc-parole-texte" data-index="${index}" rows="4" placeholder="Écris le texte du ${bloc.type.toLowerCase()} ici...">${echapperHTML(bloc.contenu)}</textarea>
+                <div class="bloc-accords-outil">
+                    <input type="text" class="champ-nom-accord" data-index="${index}" placeholder="Nom de l'accord (ex : C, G7, Am)">
+                    <button type="button" class="btn-petit btn-inserer-accord" data-index="${index}">Insérer au curseur</button>
+                </div>
             </div>
         `).join("");
 
@@ -262,6 +401,57 @@ function afficherFormulaireChant(id, push = true) {
         conteneurBlocs.querySelectorAll(".retirer-bloc").forEach(bouton => {
             bouton.addEventListener("click", (e) => {
                 blocsParoles.splice(Number(e.target.dataset.index), 1);
+                rendreBlocsParoles();
+            });
+        });
+
+        conteneurBlocs.querySelectorAll(".btn-inserer-accord").forEach(bouton => {
+            bouton.addEventListener("click", (e) => {
+                const index = Number(e.target.dataset.index);
+                const zoneTexte = conteneurBlocs.querySelector(`.bloc-parole-texte[data-index="${index}"]`);
+                const champNom = conteneurBlocs.querySelector(`.champ-nom-accord[data-index="${index}"]`);
+                const nomAccord = champNom.value.trim();
+
+                if (!nomAccord) { champNom.focus(); return; }
+
+                const debut = zoneTexte.selectionStart ?? zoneTexte.value.length;
+                const fin = zoneTexte.selectionEnd ?? zoneTexte.value.length;
+                const balise = `[${nomAccord}]`;
+                const nouvelleValeur = zoneTexte.value.slice(0, debut) + balise + zoneTexte.value.slice(fin);
+
+                zoneTexte.value = nouvelleValeur;
+                blocsParoles[index].contenu = nouvelleValeur;
+                champNom.value = "";
+                zoneTexte.focus();
+                const nouvellePosition = debut + balise.length;
+                zoneTexte.selectionStart = zoneTexte.selectionEnd = nouvellePosition;
+            });
+        });
+
+        // ---- Glisser-déposer pour réordonner les blocs ----
+        conteneurBlocs.querySelectorAll(".bloc-parole").forEach(el => {
+            el.addEventListener("dragstart", () => {
+                indexBlocGlisse = Number(el.dataset.index);
+                el.classList.add("en-glissement");
+            });
+            el.addEventListener("dragend", () => {
+                el.classList.remove("en-glissement");
+            });
+            el.addEventListener("dragover", (e) => {
+                e.preventDefault();
+                el.classList.add("survol-glissement");
+            });
+            el.addEventListener("dragleave", () => {
+                el.classList.remove("survol-glissement");
+            });
+            el.addEventListener("drop", (e) => {
+                e.preventDefault();
+                el.classList.remove("survol-glissement");
+                const indexCible = Number(el.dataset.index);
+                if (indexBlocGlisse === null || indexBlocGlisse === indexCible) return;
+                const [blocDeplace] = blocsParoles.splice(indexBlocGlisse, 1);
+                blocsParoles.splice(indexCible, 0, blocDeplace);
+                indexBlocGlisse = null;
                 rendreBlocsParoles();
             });
         });
@@ -283,8 +473,10 @@ function afficherFormulaireChant(id, push = true) {
         e.preventDefault();
         const zoneErreur = document.getElementById("erreur-form-chant");
         zoneErreur.textContent = "";
+        const boutonSubmit = e.target.querySelector("button[type=submit]");
         const fd = new FormData(e.target);
         const paroles = serialiserBlocsParoles(blocsParoles);
+
         const valeurs = {
             titre: fd.get("titre").trim(),
             auteur: fd.get("auteur").trim(),
@@ -302,7 +494,27 @@ function afficherFormulaireChant(id, push = true) {
             return;
         }
 
+        const fichierAudio = fd.get("audio");
+        if (fichierAudio && fichierAudio.size > 0) {
+            if (!fichierAudio.type.startsWith("audio/")) {
+                zoneErreur.textContent = "Le fichier audio doit être un fichier son (mp3, wav, m4a...).";
+                return;
+            }
+            if (fichierAudio.size > 20 * 1024 * 1024) {
+                zoneErreur.textContent = "Le fichier audio dépasse 20 Mo, choisis un fichier plus léger.";
+                return;
+            }
+        }
+
+        boutonSubmit.disabled = true;
+        boutonSubmit.textContent = "Envoi en cours...";
         try {
+            if (fichierAudio && fichierAudio.size > 0) {
+                valeurs.audio = await uploaderFichier(fichierAudio, "audio");
+            } else if (fd.get("supprimer_audio")) {
+                valeurs.audio = null;
+            }
+
             if (chant) {
                 await modifierChant(chant.id, valeurs);
             } else {
@@ -312,6 +524,8 @@ function afficherFormulaireChant(id, push = true) {
             afficherParoles();
         } catch (err) {
             document.getElementById("erreur-form-chant").textContent = "Erreur : " + err.message;
+            boutonSubmit.disabled = false;
+            boutonSubmit.textContent = chant ? "Enregistrer" : "Ajouter";
         }
     });
 
@@ -342,19 +556,19 @@ function afficherGalerie(push = true) {
         contenu += `
         <div class="membre">
             <div class="photo-wrapper">
-                <img class="photo-principale" src="${membre.photo || "images/default.png"}" alt="${membre.nom}" onerror="this.onerror=null; this.src='images/default.png';">
-                ${membre.photo2 ? `<img class="photo-secondaire" src="${membre.photo2}" alt="${membre.nom}">` : ''}
+                <img class="photo-principale" src="${membre.photo || "images/default.png"}" alt="${echapperHTML(membre.nom)}" onerror="this.onerror=null; this.src='images/default.png';">
+                ${membre.photo2 ? `<img class="photo-secondaire" src="${membre.photo2}" alt="${echapperHTML(membre.nom)}">` : ''}
             </div>
-            <p>${membre.nom}</p>
+            <p>${echapperHTML(membre.nom)}</p>
             ${membre.voix && membre.voix.length > 0 ? `
                 <div class="badges-voix">
-                    ${membre.voix.map(v => `<span class="badge-voix">${v === "Tenor" ? "Ténor" : v}</span>`).join("")}
+                    ${membre.voix.map(v => `<span class="badge-voix">${v === "Tenor" ? "Ténor" : echapperHTML(v)}</span>`).join("")}
                 </div>
             ` : ""}
             <button class="toggle-description" data-index="${index}">▾</button>
             <div class="description-membre" id="description-${index}">
                 <div class="description-inner">
-                    <p>${membre.description || ""}</p>
+                    <p>${echapperHTML(membre.description || "").replace(/\n/g, "<br>")}</p>
                 </div>
             </div>
             ${estConnecte() ? `
@@ -497,7 +711,7 @@ function genererCarrouselPhotos(e) {
     if (photos.length === 0) return '';
 
     const imgTag = (src) =>
-        `<img src="${src}" alt="${e.titre}" onerror="this.onerror=null; this.src='images/default.png';">`;
+        `<img src="${src}" alt="${echapperHTML(e.titre)}" onerror="this.onerror=null; this.src='images/default.png';">`;
 
     if (photos.length === 1) {
         return `<div class="scroll-photos scroll-photos-fixe">${imgTag(photos[0])}</div>`;
@@ -521,9 +735,9 @@ function afficherEvenements(push = true) {
         <div class="evenement ${estProchain ? "evenement-prochain" : ""}">
             ${estProchain ? `<span class="badge-prochain">Prochain événement</span>` : ""}
             ${genererCarrouselPhotos(e)}
-            <h4>${e.titre}</h4>
-            <p class="date-evenement">${e.date_evenement || ""}</p>
-            <p>${e.description || ""}</p>
+            <h4>${echapperHTML(e.titre)}</h4>
+            <p class="date-evenement">${echapperHTML(e.date_evenement || "")}</p>
+            <p>${echapperHTML(e.description || "").replace(/\n/g, "<br>")}</p>
             ${estConnecte() ? `
                 <div class="actions-chant" style="justify-content:center;">
                     <button class="btn-admin btn-petit" data-action="form-evenement" data-id="${e.id}">Modifier</button>
@@ -667,9 +881,9 @@ async function gererSuppressionEvenement(id) {
 function carteMembre(membre) {
     return `
     <div class="carte-hierarchie">
-        <img src="${membre.photo || "images/default.png"}" alt="${membre.nom}" onerror="this.onerror=null; this.src='images/default.png';">
-        <p class="nom-hierarchie">${membre.nom}</p>
-        <p class="role-hierarchie">${membre.role || ""}</p>
+        <img src="${membre.photo || "images/default.png"}" alt="${echapperHTML(membre.nom)}" onerror="this.onerror=null; this.src='images/default.png';">
+        <p class="nom-hierarchie">${echapperHTML(membre.nom)}</p>
+        <p class="role-hierarchie">${echapperHTML(membre.role || "")}</p>
     </div>`;
 }
 
@@ -760,7 +974,7 @@ function afficherConnexion(push = true) {
         <label>Mot de passe
             <span class="champ-mdp">
                 <input type="password" name="motdepasse" id="champ-motdepasse" required>
-                <button type="button" id="toggle-mdp" aria-label="Afficher le mot de passe">👁</button>
+                <button type="button" id="toggle-mdp" class="btn-toggle-mdp" aria-label="Afficher le mot de passe">Afficher</button>
             </span>
         </label>
         <p class="erreur-form" id="erreur-connexion"></p>
@@ -773,7 +987,7 @@ function afficherConnexion(push = true) {
         const bouton = document.getElementById("toggle-mdp");
         const visible = champ.type === "text";
         champ.type = visible ? "password" : "text";
-        bouton.textContent = visible ? "👁" : "🙈";
+        bouton.textContent = visible ? "Afficher" : "Masquer";
         bouton.setAttribute("aria-label", visible ? "Afficher le mot de passe" : "Masquer le mot de passe");
     });
 
@@ -801,8 +1015,11 @@ function onChangementConnexion() {
 // UTILITAIRE
 // ---------------------------------------------------------------------
 
+// Alias conservé pour compatibilité : utilisé dans les attributs value="...".
+// L'échappement complet (voir echapperHTML plus haut) couvre aussi bien les
+// attributs que le contenu texte, donc plus besoin de deux logiques distinctes.
 function echapper(texte) {
-    return String(texte).replace(/"/g, "&quot;");
+    return echapperHTML(texte);
 }
 
 // ---------------------------------------------------------------------
