@@ -1184,10 +1184,36 @@ if (offlineFermerBtn) offlineFermerBtn.addEventListener("click", masquerOverlayH
 if (!navigator.onLine) afficherOverlayHorsLigne();
 
 // ---------------------------------------------------------------------
+// MODE SOMBRE
+// ---------------------------------------------------------------------
+// Préférence mémorisée localement (par appareil, pas en base) : chaque
+// visiteur garde son propre choix.
+function initModeSombre() {
+    const bouton = document.getElementById("toggle-mode-sombre");
+    if (!bouton) return;
+
+    const actif = localStorage.getItem("mode-sombre") === "1";
+    appliquerModeSombre(actif, bouton);
+
+    bouton.addEventListener("click", () => {
+        const nouvelEtat = !document.documentElement.classList.contains("mode-sombre");
+        appliquerModeSombre(nouvelEtat, bouton);
+        localStorage.setItem("mode-sombre", nouvelEtat ? "1" : "0");
+    });
+}
+
+function appliquerModeSombre(actif, bouton) {
+    document.documentElement.classList.toggle("mode-sombre", actif);
+    bouton.classList.toggle("actif", actif);
+    bouton.setAttribute("aria-checked", String(actif));
+}
+
+// ---------------------------------------------------------------------
 // DEMARRAGE
 // ---------------------------------------------------------------------
 
 async function demarrer() {
+    initModeSombre();
     main.innerHTML = `
         <div class="chargement">
             <div class="spinner"></div>
