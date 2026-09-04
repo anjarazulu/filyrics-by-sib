@@ -94,26 +94,6 @@ function echapperHTML(texte) {
 // avec une balise de section ("[Couplet]", "[Refrain]", "[Bridge]"), qui elle
 // occupe toujours une ligne entière.
 
-// Sépare une ligne de paroles en { ligneNettoyee, accords } où accords est un
-// tableau de { position, nom } : position = index du caractère (dans la ligne
-// nettoyée) juste avant lequel l'accord doit être affiché.
-function analyserLigneAccords(ligne) {
-    const regex = /\[([^\[\]]+)\]/g;
-    let correspondance;
-    let dernierIndex = 0;
-    let ligneNettoyee = "";
-    const accords = [];
-
-    while ((correspondance = regex.exec(ligne)) !== null) {
-        ligneNettoyee += ligne.slice(dernierIndex, correspondance.index);
-        accords.push({ position: ligneNettoyee.length, nom: correspondance[1].trim() });
-        dernierIndex = regex.lastIndex;
-    }
-    ligneNettoyee += ligne.slice(dernierIndex);
-
-    return { ligneNettoyee, accords };
-}
-
 // Retire uniquement les balises d'accords d'un texte (utilisé pour la
 // recherche dans les paroles, où les noms d'accords ne doivent pas polluer
 // les résultats).
@@ -121,16 +101,53 @@ function retirerAccords(texte) {
     return String(texte || "").replace(/\[([^\[\]]+)\]/g, "");
 }
 
-// Construit la ligne de texte (espaces compris) à afficher au-dessus de la
-// ligne de paroles, chaque accord étant positionné au bon endroit.
-function construireLigneAccordsTexte(accords) {
-    let ligne = "";
-    accords.forEach(accord => {
-        while (ligne.length < accord.position) ligne += " ";
-        if (ligne.length > accord.position) ligne += " "; // évite de coller deux accords
-        ligne += accord.nom;
+// Découpe une ligne en segments { chord, texte } : chaque segment porte le
+// nom de l'accord qui le précède (ou null s'il n'y en a pas). C'est cette
+// segmentation — plutôt qu'un calcul de position en nombre de caractères —
+// qui permet d'afficher chaque accord juste au-dessus de son mot sans créer
+// de grands blancs artificiels quand les accords sont espacés.
+function segmenterLigneAccords(ligne) {
+    const regex = /\[([^\[\]]+)\]/g;
+    const marqueurs = [];
+    let correspondance;
+
+    while ((correspondance = regex.exec(ligne)) !== null) {
+        marqueurs.push({ index: correspondance.index, longueur: correspondance[0].length, nom: correspondance[1].trim() });
+    }
+
+    if (marqueurs.length === 0) {
+        return [{ chord: null, texte: ligne }];
+    }
+
+    const segments = [];
+    if (marqueurs[0].index > 0) {
+        segments.push({ chord: null, texte: ligne.slice(0, marqueurs[0].index) });
+    }
+    marqueurs.forEach((marqueur, i) => {
+        const debutTexte = marqueur.index + marqueur.longueur;
+        const finTexte = i + 1 < marqueurs.length ? marqueurs[i + 1].index : ligne.length;
+        segments.push({ chord: marqueur.nom, texte: ligne.slice(debutTexte, finTexte) });
     });
-    return ligne;
+
+    return segments;
+}
+
+// Construit le HTML d'une ligne avec ses accords positionnés juste au-dessus
+// du fragment de texte auquel ils s'appliquent (et non plus par comptage de
+// caractères, qui produisait de grands espaces vides).
+function rendreLigneAvecAccordsHTML(ligne) {
+    const segments = segmenterLigneAccords(ligne);
+    const aDesAccords = segments.some(s => s.chord);
+
+    if (!aDesAccords) {
+        return echapperHTML(ligne) || "&nbsp;";
+    }
+
+    return segments.map(segment => {
+        const texte = echapperHTML(segment.texte) || "\u00A0";
+        const nomAccord = segment.chord ? `<span class="nom-accord">${echapperHTML(segment.chord)}</span>` : "";
+        return `<span class="segment-accord">${nomAccord}<span class="segment-parole">${texte}</span></span>`;
+    }).join("");
 }
 
 // Transforme le texte brut stocké en base en tableau de blocs { type, contenu }.
@@ -180,8 +197,9 @@ function serialiserBlocsParoles(blocs) {
 // Construit le HTML affiché sur la page de lecture d'un chant, avec un style
 // distinct par type de section. Les couplets sont numérotés automatiquement
 // selon leur ordre d'apparition. Si "avecAccords" est vrai, chaque ligne
-// contenant des accords est affichée sur deux lignes (accords / paroles),
-// avec une police à chasse fixe pour garder l'alignement.
+// contenant au moins un accord est découpée en fragments, chaque accord
+// s'affichant juste au-dessus du fragment de texte qui le suit — sans
+// créer d'espace inutile entre deux accords éloignés sur la même ligne.
 function rendreParolesHTML(texte, avecAccords = false) {
     const blocs = parserParoles(texte);
     if (blocs.length === 0) return "";
@@ -209,20 +227,13 @@ function rendreParolesHTML(texte, avecAccords = false) {
 
         if (avecAccords) {
             contenuHTML = lignes.map(ligne => {
-                const { ligneNettoyee, accords } = analyserLigneAccords(ligne);
-                const texteLigne = echapperHTML(ligneNettoyee) || "&nbsp;";
-                if (accords.length === 0) {
-                    return `<div class="ligne-parole"><div class="ligne-texte">${texteLigne}</div></div>`;
-                }
-                const texteAccords = echapperHTML(construireLigneAccordsTexte(accords));
-                return `<div class="ligne-parole">
-                    <div class="ligne-accords">${texteAccords}</div>
-                    <div class="ligne-texte">${texteLigne}</div>
-                </div>`;
+                const contenuLigne = rendreLigneAvecAccordsHTML(ligne);
+                const aDesAccords = segmenterLigneAccords(ligne).some(s => s.chord);
+                return `<div class="ligne-parole${aDesAccords ? " ligne-avec-accord" : ""}">${contenuLigne}</div>`;
             }).join("");
         } else {
             contenuHTML = lignes
-                .map(ligne => echapperHTML(analyserLigneAccords(ligne).ligneNettoyee))
+                .map(ligne => echapperHTML(retirerAccords(ligne)))
                 .join("<br>");
         }
 
