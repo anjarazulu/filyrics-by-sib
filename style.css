@@ -11,10 +11,103 @@
   --couleur-texte-att:#5a5e78;
   --couleur-danger:#c0392b;
   --couleur-danger-clair:#e74c3c;
+  --couleur-surface:#ffffff;
+  --couleur-input-bordure:#cccccc;
   --rayon:14px;
   --rayon-pilule:22px;
   --ombre-carte:0 4px 16px rgba(10,18,80,.08);
   --ombre-carte-hover:0 8px 24px rgba(10,18,80,.14);
+  color-scheme:light;
+}
+
+/* ---- Mode sombre ---- */
+/* On ne touche qu'aux variables : tous les composants qui les utilisent déjà
+   (cartes, formulaires, boutons secondaires...) basculent automatiquement. */
+html.mode-sombre{
+  --couleur-fond-doux:#1a2040;
+  --couleur-bordure:#2c3364;
+  --couleur-texte:#e8e9f5;
+  --couleur-texte-att:#a7acce;
+  --couleur-surface:#12173a;
+  --couleur-input-bordure:#3a4180;
+  --ombre-carte:0 4px 16px rgba(0,0,0,.35);
+  --ombre-carte-hover:0 8px 24px rgba(0,0,0,.45);
+  color-scheme:dark;
+}
+html.mode-sombre body{
+  background:#070a24;
+}
+html.mode-sombre .bloc-parole,
+html.mode-sombre .apercu-audio{
+  background:var(--couleur-fond-doux);
+}
+html.mode-sombre .form-admin input,
+html.mode-sombre .form-admin select,
+html.mode-sombre .form-admin textarea,
+html.mode-sombre .barre-recherche,
+html.mode-sombre .select-recherche,
+html.mode-sombre .champ-nom-accord,
+html.mode-sombre .bloc-parole-texte{
+  background:var(--couleur-surface);
+  color:var(--couleur-texte);
+  border-color:var(--couleur-input-bordure);
+}
+html.mode-sombre .btn-toggle-mdp{
+  background:var(--couleur-fond-doux);
+  color:var(--couleur-texte);
+  border-color:var(--couleur-input-bordure);
+}
+html.mode-sombre .btn-toggle-accords,
+html.mode-sombre .btn-ajouter-bloc,
+html.mode-sombre .btn-inserer-accord{
+  background:var(--couleur-surface);
+  color:var(--couleur-texte);
+  border-color:var(--couleur-accent);
+}
+
+/* ---- Interrupteur clair/sombre ---- */
+.interrupteur-mode{
+  position:fixed;
+  top:14px;
+  right:14px;
+  z-index:50;
+  width:auto;
+  height:auto;
+  padding:0;
+  margin:0;
+  background:transparent;
+  box-shadow:none;
+}
+.interrupteur-mode:hover{
+  background:transparent;
+  transform:none;
+}
+.interrupteur-piste{
+  display:block;
+  width:46px;
+  height:26px;
+  border-radius:14px;
+  background:rgba(255,255,255,.18);
+  border:1px solid rgba(255,255,255,.4);
+  position:relative;
+  transition:background .2s ease;
+}
+.interrupteur-curseur{
+  position:absolute;
+  top:2px;
+  left:2px;
+  width:20px;
+  height:20px;
+  border-radius:50%;
+  background:var(--couleur-or);
+  transition:transform .2s ease;
+}
+.interrupteur-mode.actif .interrupteur-piste{
+  background:rgba(255,255,255,.3);
+}
+.interrupteur-mode.actif .interrupteur-curseur{
+  transform:translateX(20px);
+  background:#c9cdf0;
 }
 
 *{
@@ -53,7 +146,7 @@ header h3{
 }
 main{
   flex:1;
-  background:white;
+  background:var(--couleur-surface);
   border-radius:28px 28px 0 0;
   padding:38px 24px;
   margin-top:-18px;
@@ -180,7 +273,7 @@ footer a:hover{
 }
 
 .btn-toggle-accords{
-    background:white;
+    background:var(--couleur-surface);
     color:var(--couleur-nuit);
     border:1.5px solid var(--couleur-nuit);
 }
@@ -207,8 +300,16 @@ footer a:hover{
 }
 
 /* ---- Sections de paroles : couplet / refrain / bridge ---- */
+/* Les trois types partagent exactement la même mise en forme (fond, marges,
+   bande de couleur à gauche, poids de texte) ; seule la couleur de la bande
+   et de l'étiquette change, pour une lecture plus uniforme et posée. */
 .section-parole{
-    margin-bottom:20px;
+    margin-bottom:16px;
+    background:var(--couleur-fond-doux);
+    border-left:4px solid var(--couleur-bordure);
+    border-radius:0 var(--rayon) var(--rayon) 0;
+    padding:14px 16px;
+    color:var(--couleur-texte);
 }
 
 .section-parole .contenu-section{
@@ -222,10 +323,11 @@ footer a:hover{
     letter-spacing:.6px;
     font-weight:700;
     margin-bottom:6px;
+    color:var(--couleur-texte-att);
 }
 
 .section-parole.couplet{
-    color:var(--couleur-texte);
+    border-left-color:var(--couleur-accent);
 }
 
 .section-parole.couplet .etiquette-section{
@@ -233,27 +335,19 @@ footer a:hover{
 }
 
 .section-parole.refrain{
-    color:var(--couleur-nuit);
-    font-weight:600;
-    background:var(--couleur-fond-doux);
-    border-left:4px solid var(--couleur-or);
-    padding:14px 16px;
-    border-radius:0 var(--rayon) var(--rayon) 0;
+    border-left-color:var(--couleur-or);
 }
 
 .section-parole.refrain .etiquette-section{
-    color:var(--couleur-nuit);
+    color:#a8790a;
 }
 
 .section-parole.bridge{
-    color:var(--couleur-accent);
-    font-style:italic;
-    border-left:4px solid var(--couleur-accent);
-    padding-left:16px;
+    border-left-color:var(--couleur-nuit);
 }
 
 .section-parole.bridge .etiquette-section{
-    color:var(--couleur-accent);
+    color:var(--couleur-nuit);
 }
 
 /* ---- Affichage des accords au-dessus des paroles ---- */
@@ -399,7 +493,7 @@ footer a:hover{
     font-family:inherit;
     font-size:15px;
     padding:10px 12px;
-    border:1px solid #ccc;
+    border:1px solid var(--couleur-input-bordure);
     border-radius:8px;
     resize:vertical;
 }
@@ -415,7 +509,7 @@ footer a:hover{
     flex:1;
     font-size:13px;
     padding:8px 10px;
-    border:1px solid #ccc;
+    border:1px solid var(--couleur-input-bordure);
     border-radius:8px;
     font-family:inherit;
 }
@@ -426,7 +520,7 @@ footer a:hover{
     padding:8px 12px;
     font-size:12px;
     border-radius:8px;
-    background:white;
+    background:var(--couleur-surface);
     color:var(--couleur-nuit);
     border:1px solid var(--couleur-nuit);
     margin:0;
@@ -452,7 +546,7 @@ footer a:hover{
     padding:8px 14px;
     font-size:13px;
     border-radius:var(--rayon-pilule);
-    background:white;
+    background:var(--couleur-surface);
     color:var(--couleur-nuit);
     border:1px solid var(--couleur-nuit);
     margin:0;
@@ -581,7 +675,7 @@ button{
 .description-inner{
     padding:12px 16px;
     line-height:1.5;
-    color:#333;
+    color:var(--couleur-texte);
     font-style:italic;
     text-align:left;
     font-family:georgia;
@@ -786,7 +880,7 @@ footer a#lien-connexion{
     font-family:inherit;
     font-size:15px;
     padding:10px 12px;
-    border:1px solid #ccc;
+    border:1px solid var(--couleur-input-bordure);
     border-radius:8px;
     resize:vertical;
     transition:border-color .15s ease;
@@ -826,7 +920,7 @@ footer a#lien-connexion{
     box-shadow:none;
 }
 .btn-toggle-mdp:hover{
-    background:#e8eaf5;
+    background:var(--couleur-bordure);
     transform:none;
 }
 
@@ -941,7 +1035,7 @@ footer a#lien-connexion{
     min-width:200px;
     padding:10px 16px;
     font-size:15px;
-    border:1px solid #ccc;
+    border:1px solid var(--couleur-input-bordure);
     border-radius:var(--rayon-pilule);
     font-family:inherit;
 }
@@ -955,10 +1049,10 @@ footer a#lien-connexion{
     padding:10px 12px;
     font-size:13px;
     font-family:inherit;
-    border:1px solid #ccc;
+    border:1px solid var(--couleur-input-bordure);
     border-radius:var(--rayon-pilule);
     color:var(--couleur-nuit);
-    background:white;
+    background:var(--couleur-surface);
 }
 
 .select-recherche:focus{
@@ -1024,7 +1118,7 @@ footer a#lien-connexion{
 }
 
 .carte-hierarchie{
-    background:#f7f8fc;
+    background:var(--couleur-fond-doux);
     border-radius:12px;
     padding:12px;
     width:110px;
@@ -1116,7 +1210,7 @@ footer a#lien-connexion{
 /* ---- Cases à cocher voix / instrument (formulaire) ---- */
 
 .cases-voix{
-    border:1px solid #ccc;
+    border:1px solid var(--couleur-input-bordure);
     border-radius:8px;
     padding:10px 14px;
     display:flex;
