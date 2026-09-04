@@ -4,6 +4,62 @@
 // locales) — jamais les requêtes vers Supabase, pour que les chants,
 // membres et événements restent toujours à jour dès qu'il y a du réseau.
 
+const CACHE_NAME = "FILyrics-v5";
+
+const FICHIERS_A_METTRE_EN_CACHE = [
+    "./",
+    "./index.html",
+    "./style.css",
+    "./script.js",
+    "./data.js",
+    "./auth.js",
+    "./config.js",
+    "./images/logo.png",
+    "./images/default.png",
+    "./images/icon-192.png",
+    "./images/icon-512.png"
+];
+
+self.addEventListener("install", (event) => {
+    event.waitUntil(
+        caches.open(CACHE_NAME).then((cache) => cache.addAll(FICHIERS_A_METTRE_EN_CACHE))
+    );
+    self.skipWaiting();
+});
+
+self.addEventListener("activate", (event) => {
+    event.waitUntil(
+        caches.keys().then((noms) =>
+            Promise.all(noms.filter((n) => n !== CACHE_NAME).map((n) => caches.delete(n)))
+        )
+    );
+    self.clients.claim();
+});
+
+// Stratégie "réseau d'abord" : tant qu'il y a du réseau, on affiche toujours
+// la dernière version des fichiers (et on rafraîchit le cache au passage).
+// Le cache ne sert que de secours si le réseau échoue (mode hors-ligne),
+// pour éviter d'afficher une version périmée/mélangée par erreur.
+self.addEventListener("fetch", (event) => {
+    if (event.request.method !== "GET" || !event.request.url.startsWith(self.location.origin)) {
+        return;
+    }
+
+    event.respondWith(
+        fetch(event.request)
+            .then((reponseReseau) => {
+                const clone = reponseReseau.clone();
+                caches.open(CACHE_NAME).then((cache) => cache.put(event.request, clone));
+                return reponseReseau;
+            })
+            .catch(() => caches.match(event.request))
+    );
+});// Service worker : permet au site de fonctionner hors-ligne (pages déjà
+// visitées) et rend l'application "installable" sur Android.
+// Il ne met en cache QUE les fichiers du site lui-même (HTML/CSS/JS/images
+// locales) — jamais les requêtes vers Supabase, pour que les chants,
+// membres et événements restent toujours à jour dès qu'il y a du réseau.
+
 const CACHE_NAME = "FILyrics-v9";
 
 const FICHIERS_A_METTRE_EN_CACHE = [
