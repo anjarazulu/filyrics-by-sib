@@ -5,6 +5,7 @@
   --couleur-nuit-claire:#141d6b;
   --couleur-accent:#2f43ff;
   --couleur-or:#ffd93d;
+  --couleur-fond-page:#0a1250;
   --couleur-fond-doux:#f6f7fb;
   --couleur-bordure:#e3e5ee;
   --couleur-texte:#1c1f33;
@@ -12,6 +13,7 @@
   --couleur-danger:#c0392b;
   --couleur-danger-clair:#e74c3c;
   --couleur-surface:#ffffff;
+  --couleur-champ:#ffffff;
   --couleur-input-bordure:#cccccc;
   --couleur-accent-texte:#0a1250;
   --rayon:14px;
@@ -22,22 +24,23 @@
 }
 
 /* ---- Mode sombre ---- */
-/* On ne touche qu'aux variables : tous les composants qui les utilisent déjà
-   (cartes, formulaires, boutons secondaires...) basculent automatiquement. */
+/* Trois paliers de profondeur bien distincts pour que l'œil distingue tout
+   de suite la page, les cartes, et les champs de saisie :
+   fond de page (le plus sombre) < surface (contenu principal) <
+   fond-doux (cartes) < champ (zones de saisie, la plus claire). */
 html.mode-sombre{
-  --couleur-fond-doux:#1a2040;
-  --couleur-bordure:#2c3364;
-  --couleur-texte:#e8e9f5;
-  --couleur-texte-att:#a7acce;
-  --couleur-surface:#12173a;
-  --couleur-input-bordure:#3a4180;
-  --couleur-accent-texte:#8fa0ff;
-  --ombre-carte:0 4px 16px rgba(0,0,0,.35);
-  --ombre-carte-hover:0 8px 24px rgba(0,0,0,.45);
+  --couleur-fond-page:#050716;
+  --couleur-fond-doux:#1c2150;
+  --couleur-bordure:#3a4180;
+  --couleur-texte:#f1f2fb;
+  --couleur-texte-att:#b6bbe3;
+  --couleur-surface:#11142f;
+  --couleur-champ:#262c5e;
+  --couleur-input-bordure:#565fb8;
+  --couleur-accent-texte:#a9b8ff;
+  --ombre-carte:0 4px 16px rgba(0,0,0,.45);
+  --ombre-carte-hover:0 8px 24px rgba(0,0,0,.55);
   color-scheme:dark;
-}
-html.mode-sombre body{
-  background:#070a24;
 }
 html.mode-sombre .bloc-parole,
 html.mode-sombre .apercu-audio{
@@ -50,35 +53,41 @@ html.mode-sombre .barre-recherche,
 html.mode-sombre .select-recherche,
 html.mode-sombre .champ-nom-accord,
 html.mode-sombre .bloc-parole-texte{
-  background:var(--couleur-surface);
+  background:var(--couleur-champ);
   color:var(--couleur-texte);
   border-color:var(--couleur-input-bordure);
 }
 html.mode-sombre .btn-toggle-mdp{
-  background:var(--couleur-fond-doux);
+  background:var(--couleur-champ);
   color:var(--couleur-texte);
   border-color:var(--couleur-input-bordure);
 }
 html.mode-sombre .btn-toggle-accords,
 html.mode-sombre .btn-ajouter-bloc,
 html.mode-sombre .btn-inserer-accord{
-  background:var(--couleur-surface);
+  background:var(--couleur-champ);
   color:var(--couleur-texte);
   border-color:var(--couleur-accent);
 }
+html.mode-sombre .modale-confirmation{
+  background:var(--couleur-fond-doux);
+}
 
-/* ---- Interrupteur clair/sombre ---- */
+/* ---- Interrupteur clair/sombre (dans le footer, plus flottant) ---- */
+.footer-mode-sombre{
+  display:flex;
+  align-items:center;
+  gap:10px;
+}
 .interrupteur-mode{
-  position:fixed;
-  top:14px;
-  right:14px;
-  z-index:50;
+  display:inline-block;
   width:auto;
   height:auto;
   padding:0;
   margin:0;
   background:transparent;
   box-shadow:none;
+  vertical-align:middle;
 }
 .interrupteur-mode:hover{
   background:transparent;
@@ -86,9 +95,9 @@ html.mode-sombre .btn-inserer-accord{
 }
 .interrupteur-piste{
   display:block;
-  width:46px;
-  height:26px;
-  border-radius:14px;
+  width:40px;
+  height:22px;
+  border-radius:12px;
   background:rgba(255,255,255,.18);
   border:1px solid rgba(255,255,255,.4);
   position:relative;
@@ -98,8 +107,8 @@ html.mode-sombre .btn-inserer-accord{
   position:absolute;
   top:2px;
   left:2px;
-  width:20px;
-  height:20px;
+  width:16px;
+  height:16px;
   border-radius:50%;
   background:var(--couleur-or);
   transition:transform .2s ease;
@@ -108,7 +117,7 @@ html.mode-sombre .btn-inserer-accord{
   background:rgba(255,255,255,.3);
 }
 .interrupteur-mode.actif .interrupteur-curseur{
-  transform:translateX(20px);
+  transform:translateX(18px);
   background:#c9cdf0;
 }
 
@@ -122,7 +131,7 @@ body{
   display:flex;
   flex-direction:column;
   font-family:'Inter', Verdana, Geneva, sans-serif;
-  background:var(--couleur-nuit);
+  background:var(--couleur-fond-page);
   color:var(--couleur-texte);
 }
 h1, h2, h3, h4{
