@@ -257,27 +257,38 @@ footer a:hover{
 }
 
 /* ---- Affichage des accords au-dessus des paroles ---- */
-.contenu-section.avec-accords{
-    font-family:'Courier New', Courier, monospace;
-}
+/* Chaque accord est positionné juste au-dessus du fragment de texte qui le
+   suit (et non plus par un comptage de caractères en police à chasse fixe),
+   ce qui évite les grands espaces vides quand les accords sont espacés. */
 
 .ligne-parole{
-    margin-bottom:4px;
+    line-height:1.5;
 }
 
-.ligne-accords{
-    white-space:pre;
-    color:var(--couleur-danger);
+.ligne-parole.ligne-avec-accord{
+    margin-top:1.3em;
+    margin-bottom:6px;
+}
+
+.segment-accord{
+    position:relative;
+    display:inline-block;
+    vertical-align:bottom;
+}
+
+.nom-accord{
+    position:absolute;
+    left:0;
+    top:-1.25em;
+    font-size:.76em;
     font-weight:700;
-    font-size:.82em;
-    line-height:1.3;
-    overflow-x:auto;
+    color:var(--couleur-danger);
+    white-space:nowrap;
+    line-height:1;
 }
 
-.ligne-texte{
-    white-space:pre;
-    line-height:1.4;
-    overflow-x:auto;
+.segment-parole{
+    white-space:pre-wrap;
 }
 
 /* ---- Éditeur de paroles par blocs (formulaire admin) ---- */
