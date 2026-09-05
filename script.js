@@ -381,11 +381,31 @@ function rendreParolesHTML(texte, avecAccords = false) {
     }).join("");
 }
 
+// Petite animation décorative (portée musicale avec des notes qui rebondissent),
+// affichée sous le titre de chaque page — jamais liée à un état de chargement,
+// juste un clin d'œil au thème musical de l'app. Réutilisée telle quelle
+// partout où elle apparaît pour ne pas la dupliquer dans chaque fonction.
+const PORTEE_MUSICALE_HTML = `
+<div class="portee-musicale" aria-hidden="true">
+    <svg viewBox="0 0 160 34" class="portee-svg">
+        <g class="lignes-portee">
+            <line x1="0" y1="4" x2="160" y2="4"></line>
+            <line x1="0" y1="10" x2="160" y2="10"></line>
+            <line x1="0" y1="16" x2="160" y2="16"></line>
+            <line x1="0" y1="22" x2="160" y2="22"></line>
+            <line x1="0" y1="28" x2="160" y2="28"></line>
+        </g>
+        <g transform="translate(30,18)"><g class="note note-1"><ellipse cx="0" cy="0" rx="4.2" ry="3.2" transform="rotate(-18)"></ellipse><line x1="4" y1="-1" x2="4" y2="-16"></line></g></g>
+        <g transform="translate(80,10)"><g class="note note-2"><ellipse cx="0" cy="0" rx="4.2" ry="3.2" transform="rotate(-18)"></ellipse><line x1="4" y1="-1" x2="4" y2="-16"></line></g></g>
+        <g transform="translate(130,22)"><g class="note note-3"><ellipse cx="0" cy="0" rx="4.2" ry="3.2" transform="rotate(-18)"></ellipse><line x1="4" y1="-1" x2="4" y2="-16"></line></g></g>
+    </svg>
+</div>`;
+
 function afficherParoles(push = true) {
     definirTitre("Paroles");
     let contenu = `
         <h2>Liste des chants</h2>
-        <div class="mini-loader"><span></span><span></span><span></span></div>
+        ${PORTEE_MUSICALE_HTML}
         <div class="zone-recherche">
             <input type="search" id="recherche-chants" class="barre-recherche" placeholder="Rechercher un chant...">
             <select id="champ-recherche" class="select-recherche">
@@ -435,7 +455,7 @@ function afficherChant(id, push = true) {
     main.innerHTML = `
     <section class="page-chant">
         <h2>${echapperHTML(chant.titre)}</h2>
-        <div class="mini-loader"><span></span><span></span><span></span></div>
+        ${PORTEE_MUSICALE_HTML}
         ${estConnecte() ? `<p class="compteur-vues">${chant.vues} vue${chant.vues > 1 ? "s" : ""}</p>` : ""}
         <p><strong>Auteur :</strong> ${echapperHTML(chant.auteur || "")}</p>
         <p><strong>Compositeur :</strong> ${echapperHTML(chant.compositeur || "")}</p>
@@ -698,7 +718,7 @@ async function gererSuppressionChant(id) {
 
 function afficherGalerie(push = true) {
     definirTitre("Galerie");
-    let contenu = `<h2>Galerie</h2><div class="mini-loader"><span></span><span></span><span></span></div>`;
+    let contenu = `<h2>Galerie</h2>${PORTEE_MUSICALE_HTML}`;
 
     if (estConnecte()) {
         contenu += `<button class="btn-admin" data-action="form-membre">+ Ajouter un membre</button>`;
@@ -884,7 +904,7 @@ function afficherEvenements(push = true) {
     const passes = evenements.filter(e => e.statut === "passe");
     const futurs = evenements.filter(e => e.statut === "futur");
 
-    let contenu = `<h2>Événements</h2><div class="mini-loader"><span></span><span></span><span></span></div>`;
+    let contenu = `<h2>Événements</h2>${PORTEE_MUSICALE_HTML}`;
 
     if (estConnecte()) {
         contenu += `<button class="btn-admin" data-action="form-evenement">+ Ajouter un événement</button>`;
@@ -1057,7 +1077,7 @@ function afficherHierarchie(push = true) {
     const bureau = membres.filter(m => m.niveau === 2);
     const membresSimples = membres.filter(m => m.niveau === 3 || !m.niveau);
 
-    let contenu = `<h2>Hiérarchie et rôles</h2><div class="mini-loader"><span></span><span></span><span></span></div>`;
+    let contenu = `<h2>Hiérarchie et rôles</h2>${PORTEE_MUSICALE_HTML}`;
 
     if (membres.length === 0) {
         contenu += `<p class="aucun-resultat">Aucun membre enregistré pour le moment.</p>`;
