@@ -83,8 +83,27 @@
    <script>
       if ("serviceWorker" in navigator) {
          window.addEventListener("load", () => {
-            navigator.serviceWorker.register("sw.js").catch((err) => {
+            navigator.serviceWorker.register("sw.js").then((enregistrement) => {
+               enregistrement.addEventListener("updatefound", () => {
+                  const nouveauWorker = enregistrement.installing;
+                  if (!nouveauWorker) return;
+                  nouveauWorker.addEventListener("statechange", () => {
+                     // "installed" + un controller déjà actif = vraie mise à
+                     // jour (pas la toute première installation du site).
+                     if (nouveauWorker.state === "installed" && navigator.serviceWorker.controller) {
+                        afficherBanniereMiseAJour(nouveauWorker);
+                     }
+                  });
+               });
+            }).catch((err) => {
                console.error("Erreur enregistrement service worker:", err);
+            });
+
+            let dejaRecharge = false;
+            navigator.serviceWorker.addEventListener("controllerchange", () => {
+               if (dejaRecharge) return;
+               dejaRecharge = true;
+               window.location.reload();
             });
          });
       }
