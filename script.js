@@ -1279,13 +1279,10 @@ document.addEventListener("click", function (e) {
         return;
     }
 
-    // data-action peut se trouver aussi bien sur un <button> que sur un <a>
-    // (ex : les liens du footer) ; on cherche donc l'un ou l'autre.
     const elementAction = e.target.closest("[data-action]");
     if (!elementAction) return;
     if (elementAction.tagName === "A") e.preventDefault();
 
-    const texte = elementAction.textContent.trim().toLowerCase();
     const action = elementAction.dataset.action;
     const id = elementAction.dataset.id ? Number(elementAction.dataset.id) : null;
 
@@ -1302,9 +1299,6 @@ document.addEventListener("click", function (e) {
     else if (action === "supprimer-membre") gererSuppressionMembre(id);
     else if (action === "form-evenement") afficherFormulaireEvenement(id);
     else if (action === "supprimer-evenement") gererSuppressionEvenement(id);
-    else if (texte.includes("parole")) afficherParoles();
-    else if (texte.includes("galerie")) afficherGalerie();
-    else if (texte.includes("événement")) afficherEvenements();
 });
 
 // ---------------------------------------------------------------------
@@ -1380,11 +1374,19 @@ function appliquerModeSombre(actif, bouton) {
 
 async function demarrer() {
     initModeSombre();
-    main.innerHTML = `
-        <div class="chargement">
-            <div class="spinner"></div>
-            <p>Chargement...</p>
-        </div>`;
+    // Les boutons d'accueil sont déjà dans le HTML de départ et n'ont besoin
+    // d'aucune donnée pour fonctionner : on ne les remplace par un spinner
+    // que si on arrive directement sur une page qui, elle, a besoin des
+    // données chargées (lien profond, rechargement sur #paroles, etc.).
+    const hashInitial = location.hash.replace("#", "");
+    const vuesSansDonnees = ["", "accueil", "mentions", "connexion"];
+    if (!vuesSansDonnees.includes(hashInitial)) {
+        main.innerHTML = `
+            <div class="chargement">
+                <div class="spinner"></div>
+                <p>Chargement...</p>
+            </div>`;
+    }
     await initAuth();
     await actualiserDonnees();
     onChangementConnexion();
