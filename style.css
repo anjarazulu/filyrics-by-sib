@@ -1017,8 +1017,8 @@ footer a#lien-connexion{
 }
 
 .portee-svg{
-    width:190px;
-    height:34px;
+    width:224px;
+    height:50px;
     overflow:visible;
 }
 
@@ -1026,6 +1026,30 @@ footer a#lien-connexion{
     stroke:var(--couleur-bordure);
     stroke-width:1;
 }
+
+/* Clé de sol et bémol : purement décoratifs, aucune classe d'animation
+   n'est appliquée dessus, donc ils restent immobiles. */
+.clef-sol{
+    fill:none;
+    stroke:var(--couleur-nuit);
+    stroke-width:1.7;
+    stroke-linecap:round;
+    stroke-linejoin:round;
+}
+
+.bemol line{
+    stroke:var(--couleur-nuit);
+    stroke-width:1.6;
+    stroke-linecap:round;
+}
+
+.bemol path{
+    fill:var(--couleur-nuit);
+}
+
+html.mode-sombre .clef-sol{ stroke:var(--couleur-accent-texte); }
+html.mode-sombre .bemol line{ stroke:var(--couleur-accent-texte); }
+html.mode-sombre .bemol path{ fill:var(--couleur-accent-texte); }
 
 .note ellipse{
     fill:currentColor;
