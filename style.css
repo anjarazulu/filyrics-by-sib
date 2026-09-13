@@ -1017,9 +1017,9 @@ footer a#lien-connexion{
 }
 
 .portee-svg{
-    width:224px;
-    height:50px;
     overflow:visible;
+    /* La largeur/hauteur exactes sont fixées en ligne dans le HTML de
+       chaque page (chaque portée a sa propre largeur selon son contenu). */
 }
 
 .lignes-portee line{
@@ -1027,19 +1027,19 @@ footer a#lien-connexion{
     stroke-width:1;
 }
 
-/* Clé de sol et bémol : purement décoratifs, aucune classe d'animation
-   n'est appliquée dessus, donc ils restent immobiles. */
+/* Clé de sol, bémol, dièse : purement décoratifs et fixes. Aucune classe
+   d'animation dessus, donc ils ne bougent jamais, contrairement aux notes. */
 .clef-sol{
     fill:none;
     stroke:var(--couleur-nuit);
-    stroke-width:1.7;
+    stroke-width:2.2;
     stroke-linecap:round;
     stroke-linejoin:round;
 }
 
 .bemol line{
     stroke:var(--couleur-nuit);
-    stroke-width:1.6;
+    stroke-width:2;
     stroke-linecap:round;
 }
 
@@ -1047,9 +1047,16 @@ footer a#lien-connexion{
     fill:var(--couleur-nuit);
 }
 
+.diese line{
+    stroke:var(--couleur-nuit);
+    stroke-width:1.8;
+    stroke-linecap:round;
+}
+
 html.mode-sombre .clef-sol{ stroke:var(--couleur-accent-texte); }
 html.mode-sombre .bemol line{ stroke:var(--couleur-accent-texte); }
 html.mode-sombre .bemol path{ fill:var(--couleur-accent-texte); }
+html.mode-sombre .diese line{ stroke:var(--couleur-accent-texte); }
 
 .note ellipse{
     fill:currentColor;
@@ -1057,23 +1064,25 @@ html.mode-sombre .bemol path{ fill:var(--couleur-accent-texte); }
 
 .note line{
     stroke:currentColor;
-    stroke-width:1.6;
+    stroke-width:2;
     stroke-linecap:round;
 }
 
-/* 5 notes au total : 3 isolées + une paire de croches (note-paire) reliée
-   par une barre, qui bouge comme un seul bloc pour rester visuellement
-   attachée. Chaque note a son propre délai d'animation pour créer un
-   mouvement en cascade, comme une petite mélodie qui "rebondit". */
+/* Chaque page a sa propre combinaison de notes/couleurs/armure (voir
+   PORTEES_MUSICALES dans script.js), mais toutes réutilisent ces mêmes
+   classes de couleur et d'animation, pour rester cohérentes entre elles.
+   note-paire2 sert quand une portée a besoin d'une deuxième couleur/
+   cadence (ex : Événements, avec deux paires de croches). */
 .note-1{ color:var(--couleur-nuit); animation:note-rebond 1.8s ease-in-out infinite; }
 .note-2{ color:var(--couleur-accent); animation:note-rebond 1.8s ease-in-out infinite .25s; }
 .note-paire{ color:var(--couleur-or); animation:note-rebond-paire 2.1s ease-in-out infinite .45s; }
 .note-4{ color:var(--couleur-nuit); animation:note-rebond 1.8s ease-in-out infinite .75s; }
 .note-5{ color:var(--couleur-accent); animation:note-rebond 1.8s ease-in-out infinite 1s; }
+.note-paire2{ color:var(--couleur-accent); animation:note-rebond-paire 2.1s ease-in-out infinite .1s; }
 
 .barre-croches{
     stroke:currentColor;
-    stroke-width:1.6;
+    stroke-width:2;
     stroke-linecap:round;
 }
 
@@ -1082,19 +1091,20 @@ html.mode-sombre .note-4{ color:var(--couleur-accent-texte); }
 
 /* Rebond + légère rotation, avec un tout petit décalage horizontal pour
    que le mouvement paraisse moins mécanique qu'un simple aller-retour
-   vertical. */
+   vertical. Amplitude un peu plus grande que les notes elles-mêmes,
+   pour rester bien visible à la nouvelle échelle. */
 @keyframes note-rebond{
     0%, 100%{ transform:translate(0,0) rotate(0deg); }
-    50%{ transform:translate(2px,-6px) rotate(6deg); }
+    50%{ transform:translate(3px,-9px) rotate(7deg); }
 }
 
 @keyframes note-rebond-paire{
     0%, 100%{ transform:translate(0,0) rotate(0deg); }
-    50%{ transform:translate(-2px,-5px) rotate(-4deg); }
+    50%{ transform:translate(-3px,-7.5px) rotate(-5deg); }
 }
 
 /* Petites étincelles en forme d'étoile à 4 branches, qui apparaissent puis
-   disparaissent en boucle (scintillement) près de deux des notes. */
+   disparaissent en boucle (scintillement) près de certaines notes. */
 .etincelle{
     fill:var(--couleur-or);
     transform-origin:center;
