@@ -1028,35 +1028,19 @@ footer a#lien-connexion{
 }
 
 /* Clé de sol, bémol, dièse : purement décoratifs et fixes. Aucune classe
-   d'animation dessus, donc ils ne bougent jamais, contrairement aux notes. */
-.clef-sol{
-    fill:none;
-    stroke:var(--couleur-nuit);
-    stroke-width:2.2;
-    stroke-linecap:round;
-    stroke-linejoin:round;
-}
-
-.bemol line{
-    stroke:var(--couleur-nuit);
-    stroke-width:2;
-    stroke-linecap:round;
-}
-
-.bemol path{
+   d'animation dessus, donc ils ne bougent jamais, contrairement aux notes.
+   Tracés pleins (fill), pas de contour à dessiner au trait. */
+.clef-sol path,
+.bemol path,
+.diese path{
     fill:var(--couleur-nuit);
 }
 
-.diese line{
-    stroke:var(--couleur-nuit);
-    stroke-width:1.8;
-    stroke-linecap:round;
+html.mode-sombre .clef-sol path,
+html.mode-sombre .bemol path,
+html.mode-sombre .diese path{
+    fill:var(--couleur-accent-texte);
 }
-
-html.mode-sombre .clef-sol{ stroke:var(--couleur-accent-texte); }
-html.mode-sombre .bemol line{ stroke:var(--couleur-accent-texte); }
-html.mode-sombre .bemol path{ fill:var(--couleur-accent-texte); }
-html.mode-sombre .diese line{ stroke:var(--couleur-accent-texte); }
 
 .note ellipse{
     fill:currentColor;
