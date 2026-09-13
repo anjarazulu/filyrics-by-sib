@@ -1017,7 +1017,7 @@ footer a#lien-connexion{
 }
 
 .portee-svg{
-    width:160px;
+    width:190px;
     height:34px;
     overflow:visible;
 }
@@ -1037,15 +1037,56 @@ footer a#lien-connexion{
     stroke-linecap:round;
 }
 
+/* 5 notes au total : 3 isolées + une paire de croches (note-paire) reliée
+   par une barre, qui bouge comme un seul bloc pour rester visuellement
+   attachée. Chaque note a son propre délai d'animation pour créer un
+   mouvement en cascade, comme une petite mélodie qui "rebondit". */
 .note-1{ color:var(--couleur-nuit); animation:note-rebond 1.8s ease-in-out infinite; }
 .note-2{ color:var(--couleur-accent); animation:note-rebond 1.8s ease-in-out infinite .25s; }
-.note-3{ color:var(--couleur-or); animation:note-rebond 1.8s ease-in-out infinite .5s; }
+.note-paire{ color:var(--couleur-or); animation:note-rebond-paire 2.1s ease-in-out infinite .45s; }
+.note-4{ color:var(--couleur-nuit); animation:note-rebond 1.8s ease-in-out infinite .75s; }
+.note-5{ color:var(--couleur-accent); animation:note-rebond 1.8s ease-in-out infinite 1s; }
+
+.barre-croches{
+    stroke:currentColor;
+    stroke-width:1.6;
+    stroke-linecap:round;
+}
 
 html.mode-sombre .note-1{ color:var(--couleur-accent-texte); }
+html.mode-sombre .note-4{ color:var(--couleur-accent-texte); }
 
+/* Rebond + légère rotation, avec un tout petit décalage horizontal pour
+   que le mouvement paraisse moins mécanique qu'un simple aller-retour
+   vertical. */
 @keyframes note-rebond{
-    0%, 100%{ transform:translateY(0) rotate(0deg); }
-    50%{ transform:translateY(-6px) rotate(6deg); }
+    0%, 100%{ transform:translate(0,0) rotate(0deg); }
+    50%{ transform:translate(2px,-6px) rotate(6deg); }
+}
+
+@keyframes note-rebond-paire{
+    0%, 100%{ transform:translate(0,0) rotate(0deg); }
+    50%{ transform:translate(-2px,-5px) rotate(-4deg); }
+}
+
+/* Petites étincelles en forme d'étoile à 4 branches, qui apparaissent puis
+   disparaissent en boucle (scintillement) près de deux des notes. */
+.etincelle{
+    fill:var(--couleur-or);
+    transform-origin:center;
+    animation:etincelle-scintille 2.4s ease-in-out infinite;
+}
+
+.etincelle-2{
+    fill:var(--couleur-accent);
+    animation-delay:1.1s;
+}
+
+html.mode-sombre .etincelle{ fill:var(--couleur-accent-texte); }
+
+@keyframes etincelle-scintille{
+    0%, 100%{ opacity:0; transform:scale(.4); }
+    50%{ opacity:1; transform:scale(1); }
 }
 
 /* ---- Indicateur de chargement (spinner) ---- */
@@ -1317,107 +1358,6 @@ html.mode-sombre .note-1{ color:var(--couleur-accent-texte); }
 /* ---------------------------------------------------------------------
    OVERLAY HORS LIGNE
 --------------------------------------------------------------------- */
-
-/* Bandeau discret (PAS un overlay bloquant) : reste en haut de l'écran,
-   n'empêche jamais de consulter ou naviguer sur le site. Les données déjà
-   chargées (cache local + fichiers mis en cache par le service worker)
-   restent utilisables hors ligne. */
-#offline-overlay{
-    display:none;
-    position:fixed;
-    top:0;
-    left:0;
-    right:0;
-    z-index:9999;
-    background:var(--couleur-nuit);
-    color:#fff;
-    align-items:center;
-    justify-content:center;
-    gap:12px;
-    text-align:left;
-    padding:8px 44px 8px 14px;
-    box-shadow:0 2px 8px rgba(0,0,0,.25);
-}
-
-#offline-overlay.visible{
-    display:flex;
-}
-
-.mascotte-hors-ligne{
-    width:34px;
-    height:40px;
-    flex-shrink:0;
-    animation:flotter 2.6s ease-in-out infinite;
-}
-
-.mascotte-hors-ligne svg{
-    width:100%;
-    height:100%;
-}
-
-.fantome-corps{
-    fill:var(--couleur-accent);
-    stroke:var(--couleur-or);
-    stroke-width:2;
-}
-
-.fantome-oeil{
-    fill:var(--couleur-nuit);
-    animation:clignoter 4s ease-in-out infinite;
-}
-
-.fantome-bouche{
-    stroke:var(--couleur-nuit);
-}
-
-@keyframes flotter{
-    0%, 100%{ transform:translateY(0); }
-    50%{ transform:translateY(-4px); }
-}
-
-@keyframes clignoter{
-    0%, 92%, 100%{ transform:scaleY(1); }
-    96%{ transform:scaleY(0.1); }
-}
-
-.offline-texte{
-    font-size:13px;
-    line-height:1.4;
-    margin:0;
-    color:#e6e9ff;
-    flex:1;
-}
-
-#offline-retry{
-    background:var(--couleur-or);
-    color:var(--couleur-nuit);
-    border:none;
-    font-weight:bold;
-    padding:6px 16px;
-    border-radius:18px;
-    font-size:13px;
-    cursor:pointer;
-    flex-shrink:0;
-}
-
-#offline-retry:hover{
-    background:#fff3a3;
-}
-
-#offline-fermer{
-    position:absolute;
-    top:6px;
-    right:10px;
-    background:none;
-    border:none;
-    color:#e6e9ff;
-    font-size:16px;
-    cursor:pointer;
-    line-height:1;
-}
-
-/* Le contenu de la page n'a plus besoin d'être repoussé sous le bandeau :
-   celui-ci est volontairement fin et ne recouvre que le haut de l'écran. */
 
 /* ---------------------------------------------------------------------
    TOASTS (messages de confirmation après une action admin)
