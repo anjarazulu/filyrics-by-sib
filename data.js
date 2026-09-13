@@ -4,10 +4,14 @@
 
 // ---------- Lecture ----------
 
-// ---------- Cache local (pour l'accès hors-ligne) ----------
-// À chaque chargement réussi, on garde une copie locale des données.
-// Si Supabase est injoignable (pas de réseau, serveur en panne...), on sert
-// cette dernière copie connue plutôt que de bloquer l'appli.
+// ---------- Cache local (filet de sécurité supplémentaire) ----------
+// La mise en cache "officielle" des données hors-ligne se fait maintenant
+// dans le service worker (sw.js), qui intercepte les requêtes vers
+// Supabase et sait servir la dernière réponse connue quand le réseau ne
+// répond pas — ça marche même juste après avoir rouvert l'appli, sans
+// attendre que ce fichier s'exécute. Ce cache localStorage-ci reste en
+// plus, comme double sécurité pour les tout premiers navigateurs/appareils
+// qui n'auraient pas de service worker actif.
 function sauvegarderCacheLocal(cle, donnees) {
     try {
         localStorage.setItem(cle, JSON.stringify(donnees));
@@ -29,11 +33,9 @@ async function chargerChants() {
     const { data, error } = await sb.from("chants").select("*").order("id");
     if (error) {
         console.error("Erreur chargement chants:", error);
-        if (typeof afficherOverlayHorsLigne === "function") afficherOverlayHorsLigne();
         return lireCacheLocal("cache_chants");
     }
     sauvegarderCacheLocal("cache_chants", data);
-    if (typeof masquerOverlayHorsLigne === "function") masquerOverlayHorsLigne();
     return data;
 }
 
@@ -41,11 +43,9 @@ async function chargerMembres() {
     const { data, error } = await sb.from("membres").select("*").order("id");
     if (error) {
         console.error("Erreur chargement membres:", error);
-        if (typeof afficherOverlayHorsLigne === "function") afficherOverlayHorsLigne();
         return lireCacheLocal("cache_membres");
     }
     sauvegarderCacheLocal("cache_membres", data);
-    if (typeof masquerOverlayHorsLigne === "function") masquerOverlayHorsLigne();
     return data;
 }
 
@@ -53,11 +53,9 @@ async function chargerEvenements() {
     const { data, error } = await sb.from("evenements").select("*").order("id");
     if (error) {
         console.error("Erreur chargement evenements:", error);
-        if (typeof afficherOverlayHorsLigne === "function") afficherOverlayHorsLigne();
         return lireCacheLocal("cache_evenements");
     }
     sauvegarderCacheLocal("cache_evenements", data);
-    if (typeof masquerOverlayHorsLigne === "function") masquerOverlayHorsLigne();
     return data;
 }
 
